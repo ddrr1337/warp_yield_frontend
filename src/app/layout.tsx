@@ -10,6 +10,7 @@ import "../styles/prism-vsc-dark-plus.css";
 import ToasterContext from "./api/contex/ToasetContex";
 import { useEffect, useState } from "react";
 import PreLoader from "@/components/Common/PreLoader";
+import { MetaMaskProvider } from "metamask-react";
 
 export default function RootLayout({
   children,
@@ -34,19 +35,21 @@ export default function RootLayout({
         {loading ? (
           <PreLoader />
         ) : (
-          <SessionProvider>
-            <ThemeProvider
-              attribute="class"
-              enableSystem={false}
-              defaultTheme="light"
-            >
-              <ToasterContext />
-              <Header />
-              {children}
-              <Footer />
-              <ScrollToTop />
-            </ThemeProvider>
-          </SessionProvider>
+          <MetaMaskProvider>
+            <SessionProvider>
+              <ThemeProvider
+                attribute="class"
+                enableSystem={false}
+                defaultTheme="light"
+              >
+                <ToasterContext />
+                <Header />
+                {children}
+                <Footer />
+                <ScrollToTop />
+              </ThemeProvider>
+            </SessionProvider>
+          </MetaMaskProvider>
         )}
       </body>
     </html>

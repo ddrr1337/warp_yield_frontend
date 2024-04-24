@@ -1,6 +1,6 @@
 import Breadcrumb from "@/components/Common/Breadcrumb";
-import Contact from "@/components/Contact";
 import { Metadata } from "next";
+import Dashboard from "@/components/Dashboard/Dashboard";
 
 export const metadata: Metadata = {
   title: "Contact Page | Play SaaS Starter Kit and Boilerplate for Next.js",
@@ -10,7 +10,7 @@ export const metadata: Metadata = {
 const ContactPage = () => {
   return (
     <>
-      <Contact />
+      <Dashboard />
     </>
   );
 };

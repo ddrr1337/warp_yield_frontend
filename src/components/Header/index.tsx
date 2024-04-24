@@ -5,10 +5,13 @@ import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
+import { useMetaMask } from "metamask-react";
+import { FaXTwitter } from "react-icons/fa6";
 
 import menuData from "./menuData";
 
 const Header = () => {
+  const { status, connect, account, chainId, ethereum } = useMetaMask();
   const { data: session } = useSession();
 
   const pathUrl = usePathname();
@@ -61,45 +64,14 @@ const Header = () => {
                   sticky ? "py-2" : "py-5"
                 } `}
               >
-                {pathUrl !== "/" ? (
-                  <>
-                    <Image
-                      src={`/images/logo/logo.svg`}
-                      alt="logo"
-                      width={240}
-                      height={30}
-                      className="header-logo w-full dark:hidden"
-                    />
-                    <Image
-                      src={`/images/logo/logo-white.svg`}
-                      alt="logo"
-                      width={240}
-                      height={30}
-                      className="header-logo hidden w-full dark:block"
-                    />
-                  </>
-                ) : (
-                  <>
-                    <Image
-                      src={`${
-                        sticky
-                          ? "/images/logo/logo.svg"
-                          : "/images/logo/logo-white.svg"
-                      }`}
-                      alt="logo"
-                      width={140}
-                      height={30}
-                      className="header-logo w-full dark:hidden"
-                    />
-                    <Image
-                      src={"/images/logo/logo-white.svg"}
-                      alt="logo"
-                      width={140}
-                      height={30}
-                      className="header-logo hidden w-full dark:block"
-                    />
-                  </>
-                )}
+                <div className=" scale-110">
+                  <div className="text-xl">
+                    <span className="m-0.5 bg-blue-700 pl-12 pr-1 text-white">
+                      WARP
+                    </span>
+                    <span className=" font-light">YIELD</span>
+                  </div>
+                </div>
               </Link>
             </div>
             <div className="flex w-full items-center justify-between px-4">
@@ -259,11 +231,14 @@ const Header = () => {
                 </nav>
               </div>
               <div className="hidden items-center justify-end pr-16 sm:flex lg:pr-0">
+                <Link href={"https://twitter.com/iNcAeLuM007"} target="_blank">
+                  <FaXTwitter size={22} className="mr-1 hover:text-blue" />
+                </Link>
                 {/* theme toggler */}
                 <button
                   aria-label="theme toggler"
                   onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
-                  className="flex h-8 w-8 items-center justify-center text-body-color duration-300 dark:text-white"
+                  className="mr-3 flex h-8 w-8 items-center justify-center text-body-color duration-300  dark:text-white"
                 >
                   <span>
                     <svg
@@ -285,72 +260,17 @@ const Header = () => {
                     </svg>
                   </span>
                 </button>
-
-                {session?.user ? (
-                  <>
-                    <p
-                      className={`loginBtn px-7 py-3 text-base font-medium ${
-                        !sticky && pathUrl === "/" ? "text-white" : "text-dark"
-                      }`}
-                    >
-                      {session?.user?.name}
-                    </p>
-                    {pathUrl !== "/" || sticky ? (
-                      <button
-                        onClick={() => signOut()}
-                        className="signUpBtn rounded-lg bg-primary bg-opacity-100 px-6 py-3 text-base font-medium text-white duration-300 ease-in-out hover:bg-opacity-20 hover:text-dark"
-                      >
-                        Sign Out
-                      </button>
-                    ) : (
-                      <button
-                        onClick={() => signOut()}
-                        className="signUpBtn rounded-lg bg-white bg-opacity-20 px-6 py-3 text-base font-medium text-white duration-300 ease-in-out hover:bg-opacity-100 hover:text-dark"
-                      >
-                        Sign Out
-                      </button>
-                    )}
-                  </>
+                {!account ? (
+                  <button
+                    onClick={connect}
+                    className="rounded-[4px] bg-primary px-4 py-2 text-sm font-medium text-white duration-300 ease-in-out hover:bg-primary/90 "
+                  >
+                    Connect Wallet
+                  </button>
                 ) : (
-                  <>
-                    {pathUrl !== "/" ? (
-                      <>
-                        <Link
-                          href="/signin"
-                          className="px-7 py-3 text-base font-medium text-dark hover:opacity-70 dark:text-white"
-                        >
-                          Sign In
-                        </Link>
-                        <Link
-                          href="/signup"
-                          className="rounded-lg bg-primary px-6 py-3 text-base font-medium text-white duration-300 ease-in-out hover:bg-primary/90 dark:bg-white/10 dark:hover:bg-white/20"
-                        >
-                          Sign Up
-                        </Link>
-                      </>
-                    ) : (
-                      <>
-                        <Link
-                          href="/signin"
-                          className={`px-7 py-3 text-base font-medium hover:opacity-70 ${
-                            sticky ? "text-dark dark:text-white" : "text-white"
-                          }`}
-                        >
-                          Sign In
-                        </Link>
-                        <Link
-                          href="/signup"
-                          className={`rounded-lg px-6 py-3 text-base font-medium text-white duration-300 ease-in-out ${
-                            sticky
-                              ? "bg-primary hover:bg-primary/90 dark:bg-white/10 dark:hover:bg-white/20"
-                              : "bg-white/10 hover:bg-white/20"
-                          }`}
-                        >
-                          Sign Up
-                        </Link>
-                      </>
-                    )}
-                  </>
+                  <div className=" rounded-[4px] bg-primary px-4 py-2 text-sm font-medium text-white duration-300 ease-in-out hover:bg-primary/90 ">
+                    Connected
+                  </div>
                 )}
               </div>
             </div>
