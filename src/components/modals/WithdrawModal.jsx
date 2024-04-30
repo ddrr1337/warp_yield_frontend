@@ -6,27 +6,35 @@ import {
   getERC20BalanceFromProvider,
   getTotalSupplyAWRPFromProvider,
   withdrawUsdc,
+  getLinkFeesWithdraw,
+  getERC20Allowance,
+  approveERC20,
 } from "@/components/metamask/Metamask";
-import {
-  addressSlaveTestnet,
-  sepoliaMaster,
-} from "@/data/contractTestnetAddresses";
-import { dataContracts } from "@/data/dataContracts";
-import { useMetaMask } from "metamask-react";
-import { arbitrumSepoliaProviderAlchemyUrl } from "@/data/providers";
-import Loading from "../Common/Loading";
-import { cahinLinkCCIP } from "@/data/explorers";
 
-const WithdrawModal = ({ withdrawModal, setWithrawModal, userChainId }) => {
-  const activeNodeChain = "arbitrum";
-  const activeNodeChainId = 421614;
+import { dataContracts, cahinLinkCCIPExplorer } from "@/data/dataContracts";
+import Loading from "../Common/Loading";
+import { LuRefreshCw } from "react-icons/lu";
+import { IoInformationCircleOutline } from "react-icons/io5";
+
+const WithdrawModal = ({
+  withdrawModal,
+  setWithrawModal,
+  userChainId,
+  activeNodeChainId,
+  masterChainId,
+  account,
+}) => {
   const [vaultBalance, setVaultBalance] = useState(0);
   const [AWRPUserBalance, setAWRPUserBalance] = useState(0);
-  const { status, connect, account, chainId, ethereum } = useMetaMask();
+  const [linkFeeRequired, setLinkFeeRequired] = useState(0);
+  const [linkAllowance, setLinkAllowance] = useState(0);
   const [AWRPTotalSupply, setAWRPTotalSupply] = useState(0);
   const [burnAWRP, setBurnAWRP] = useState(0);
   const [txHash, setTxHash] = useState(null);
   const [isSendingTx, setIsSendingTx] = useState(false);
+  const [refreshing, setRefreshing] = useState(false);
+  const [isSendingLinkApproval, setIsSendingLinkAproval] = useState(false);
+  const [isDepositTx, setIsDepositTx] = useState(false);
 
   const handleInput = (e) => {
     let value = e.target.value;
@@ -43,7 +51,45 @@ const WithdrawModal = ({ withdrawModal, setWithrawModal, userChainId }) => {
   const calculateUsdcReceived = () => {
     const amount =
       (burnAWRP * 10 ** 18 * 10 ** 18 * vaultBalance) / AWRPTotalSupply;
+
     return amount / 10 ** 18;
+  };
+
+  const getCurrentLinkFees = () => {
+    getLinkFeesWithdraw(
+      dataContracts[activeNodeChainId].chainIdCCIP,
+      dataContracts[activeNodeChainId].slave,
+      account,
+    ).then((response) => {
+      setLinkFeeRequired(response);
+    });
+  };
+  const handleApproveLink = async () => {
+    try {
+      setIsDepositTx(false);
+      setTxHash(null);
+      setIsSendingLinkAproval(true);
+      const tx = await approveERC20(
+        dataContracts[masterChainId].link,
+        dataContracts[masterChainId].master,
+        linkFeeRequired * 1.2,
+        1,
+      );
+      if (tx && tx.wait) {
+        setTxHash(tx);
+        await tx.wait();
+        const response = await getERC20Allowance(
+          dataContracts[masterChainId].link,
+          account,
+          dataContracts[masterChainId].master,
+        );
+        setLinkAllowance(response);
+      }
+    } catch (error) {
+      console.error("Error approving USDC:", error);
+    } finally {
+      setIsSendingLinkAproval(false);
+    }
   };
 
   useEffect(() => {
@@ -54,18 +100,24 @@ const WithdrawModal = ({ withdrawModal, setWithrawModal, userChainId }) => {
         },
       );
       getERC20BalanceFromProvider(
-        addressSlaveTestnet[activeNodeChain].ausdc,
-        arbitrumSepoliaProviderAlchemyUrl,
-        addressSlaveTestnet[activeNodeChain].slave,
+        dataContracts[activeNodeChainId].ausdc,
+        dataContracts[activeNodeChainId].provider.alchemy,
+        dataContracts[activeNodeChainId].slave,
       ).then((response) => {
         setVaultBalance(response);
       });
       getTotalSupplyAWRPFromProvider(
-        addressSlaveTestnet[activeNodeChain].slave,
-        arbitrumSepoliaProviderAlchemyUrl,
+        dataContracts[activeNodeChainId].slave,
+        dataContracts[activeNodeChainId].provider.alchemy,
       ).then((response) => {
         setAWRPTotalSupply(response);
       });
+      getCurrentLinkFees();
+      getERC20Allowance(
+        dataContracts[masterChainId].link,
+        account,
+        dataContracts[masterChainId].master,
+      ).then((response) => setLinkAllowance(response));
     }
   }, [account]);
 
@@ -74,7 +126,6 @@ const WithdrawModal = ({ withdrawModal, setWithrawModal, userChainId }) => {
       setIsSendingTx(true);
       setTxHash(null);
       const tx = await withdrawUsdc(
-        dataContracts[userChainId].master,
         dataContracts[activeNodeChainId].chainIdCCIP,
         dataContracts[activeNodeChainId].slave,
         burnAWRP,
@@ -87,8 +138,14 @@ const WithdrawModal = ({ withdrawModal, setWithrawModal, userChainId }) => {
           dataContracts[userChainId].master,
           account,
         );
-        console.log("balance", responseBalanceAwrp);
         setAWRPUserBalance(responseBalanceAwrp);
+
+        const response = await getERC20Allowance(
+          dataContracts[masterChainId].link,
+          account,
+          dataContracts[masterChainId].master,
+        );
+        setLinkAllowance(response);
       }
     } catch (error) {
       console.error("Error withdrawing USDC:", error);
@@ -114,11 +171,10 @@ const WithdrawModal = ({ withdrawModal, setWithrawModal, userChainId }) => {
                 <div className="flex items-center">
                   <h3 className="flex text-lg font-semibold text-gray-900 dark:text-white">
                     Withdraw USDC On{" "}
-                    {activeNodeChain.charAt(0).toUpperCase() +
-                      activeNodeChain.slice(1)}
+                    {dataContracts[activeNodeChainId].formatedName}
                     <span>
                       <Image
-                        src={`/images/${activeNodeChain}.svg`}
+                        src={dataContracts[activeNodeChainId].icon}
                         alt="usdcIcon"
                         height={25}
                         width={25}
@@ -144,9 +200,9 @@ const WithdrawModal = ({ withdrawModal, setWithrawModal, userChainId }) => {
                 >
                   <path
                     stroke="currentColor"
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    stroke-width="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth="2"
                     d="m1 1 6 6m0 0 6 6M7 7l6-6M7 7l-6 6"
                   />
                 </svg>
@@ -158,17 +214,13 @@ const WithdrawModal = ({ withdrawModal, setWithrawModal, userChainId }) => {
               <div className="mb-4 grid grid-cols-2 gap-4">
                 <div className="col-span-2">
                   <div className="flex justify-between">
-                    <label
-                      for="name"
-                      className="mb-2 ml-1 block text-sm font-medium text-gray-900 dark:text-white"
-                    >
+                    <label className="mb-2 ml-1 block text-sm font-medium text-gray-900 dark:text-white">
                       Select Withdraw Amount
                     </label>
                     <button
                       onClick={() =>
                         setBurnAWRP(parseFloat(AWRPUserBalance / 10 ** 18))
                       }
-                      for="name"
                       className=" mr-1 flex items-center text-xs font-medium text-violet-500"
                     >
                       Balance{" "}
@@ -188,14 +240,11 @@ const WithdrawModal = ({ withdrawModal, setWithrawModal, userChainId }) => {
                   />
                 </div>
                 <div className="col-span-2 sm:col-span-1">
-                  <label
-                    for="price"
-                    className="mb-2 ml-1 flex text-xs font-medium text-gray-900 dark:text-white"
-                  >
+                  <label className="mb-2 ml-1 flex text-xs font-medium text-gray-900 dark:text-white">
                     You Will Get On Chain{" "}
                     <span>
                       <Image
-                        src={`/images/${[activeNodeChain]}.svg`}
+                        src={dataContracts[activeNodeChainId].icon}
                         alt="activeNode"
                         height={17}
                         width={17}
@@ -217,6 +266,76 @@ const WithdrawModal = ({ withdrawModal, setWithrawModal, userChainId }) => {
                       </span>{" "}
                       USDC
                     </div>
+                  </div>
+                </div>
+                <div className="col-span-2 sm:col-span-1"></div>
+                <div className="col-span-2 sm:col-span-1">
+                  <label className="mb-2 ml-1 block text-xs font-medium text-gray-900 dark:text-white">
+                    Current Fee For Deposit
+                  </label>
+                  <div
+                    className={` focus:ring-primary-600 focus:border-primary-600 dark:focus:ring-primary-500 dark:focus:border-primary-500 block flex w-full justify-between rounded-lg border   ${linkFeeRequired > linkAllowance ? "border-red" : "border-gray-300"} bg-gray-50 p-2.5 text-sm text-gray-900 dark:border-gray-500 dark:bg-gray-600 dark:text-white dark:placeholder-gray-400`}
+                  >
+                    <div
+                      className={`${refreshing && " animate-bounce opacity-50"}`}
+                    >
+                      {parseFloat(linkFeeRequired / 10 ** 18).toFixed(5)}{" "}
+                      <span className="text-[10px]">LINK</span>
+                    </div>
+
+                    <button
+                      onClick={() => {
+                        setRefreshing(true);
+                        getCurrentLinkFees();
+
+                        // Agrega un retardo de 1 segundo antes de cambiar refreshing a false
+                        setTimeout(() => {
+                          setRefreshing(false);
+                        }, 1000); // 1000 milisegundos = 1 segundo
+                      }}
+                    >
+                      <LuRefreshCw className=" transform transition duration-300 ease-in-out hover:rotate-180 focus:opacity-50" />
+                    </button>
+                  </div>
+                </div>
+                <div className="col-span-2 sm:col-span-1">
+                  <button
+                    onClick={() => handleApproveLink()}
+                    className={`  
+                   " mt-6 w-40 items-center rounded-[4px] bg-blue-700 px-3 py-1.5 text-center text-xs font-medium text-white hover:bg-blue-800 focus:outline-none focus:ring-4 focus:ring-blue-300 
+                   dark:bg-blue-600 dark:hover:bg-blue-700
+                   dark:focus:ring-blue-800
+                  `}
+                  >
+                    {isSendingLinkApproval ? (
+                      <Loading />
+                    ) : (
+                      <div className="flex justify-center">
+                        Approve Some Link{" "}
+                        <span>
+                          <IoInformationCircleOutline
+                            size={15}
+                            className="ml-1"
+                          />
+                        </span>{" "}
+                      </div>
+                    )}
+                  </button>
+                  <div className="ml-1 mt-1 flex text-xs ">
+                    Allowed:{" "}
+                    <span className="ml-1 ">
+                      {(linkAllowance / 10 ** 18).toFixed(5)}
+                    </span>{" "}
+                    <span>
+                      <Image
+                        src={`/images/link.svg`}
+                        alt="usdcIcon"
+                        height={13}
+                        width={13}
+                        className="mx-1 "
+                      />
+                    </span>{" "}
+                    <span className="">LINK</span>
                   </div>
                 </div>
 
@@ -270,7 +389,7 @@ const WithdrawModal = ({ withdrawModal, setWithrawModal, userChainId }) => {
 
                     <div className="mt-1 flex justify-center text-sm">
                       <Link
-                        href={`${cahinLinkCCIP}${txHash.hash}`}
+                        href={`${cahinLinkCCIPExplorer}${txHash.hash}`}
                         target="_blank"
                       >
                         <span className="hover:text-violet-500">{`${txHash.hash.slice(

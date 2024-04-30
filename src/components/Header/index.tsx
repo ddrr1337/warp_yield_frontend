@@ -7,6 +7,7 @@ import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 import { useMetaMask } from "metamask-react";
 import { FaXTwitter } from "react-icons/fa6";
+import Logo from "@/components/Common/Logo";
 
 import menuData from "./menuData";
 
@@ -57,23 +58,7 @@ const Header = () => {
       >
         <div className="container">
           <div className="relative -mx-4 flex items-center justify-between">
-            <div className="w-60 max-w-full px-4">
-              <Link
-                href="/"
-                className={`navbar-logo block w-full ${
-                  sticky ? "py-2" : "py-5"
-                } `}
-              >
-                <div className=" scale-110">
-                  <div className="text-xl">
-                    <span className="m-0.5 bg-blue-700 pl-12 pr-1 text-white">
-                      WARP
-                    </span>
-                    <span className=" font-light">YIELD</span>
-                  </div>
-                </div>
-              </Link>
-            </div>
+            <Logo isFooter={false} />
             <div className="flex w-full items-center justify-between px-4">
               <div>
                 <button
@@ -232,25 +217,25 @@ const Header = () => {
               </div>
               <div className="hidden items-center justify-end pr-16 sm:flex lg:pr-0">
                 <Link href={"https://twitter.com/iNcAeLuM007"} target="_blank">
-                  <FaXTwitter size={22} className="mr-1 hover:text-blue" />
+                  <FaXTwitter size={22} className={`mr-1 hover:text-blue `} />
                 </Link>
                 {/* theme toggler */}
                 <button
                   aria-label="theme toggler"
                   onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
-                  className="mr-3 flex h-8 w-8 items-center justify-center text-body-color duration-300  dark:text-white"
+                  className="mr-3 flex h-8 w-8 items-center justify-center text-body-color duration-300   dark:text-white"
                 >
                   <span>
                     <svg
                       viewBox="0 0 16 16"
-                      className="hidden h-[22px] w-[22px] fill-current dark:block"
+                      className="hidden h-[22px] w-[22px] fill-current hover:fill-blue dark:block"
                     >
                       <path d="M4.50663 3.2267L3.30663 2.03337L2.36663 2.97337L3.55996 4.1667L4.50663 3.2267ZM2.66663 7.00003H0.666626V8.33337H2.66663V7.00003ZM8.66663 0.366699H7.33329V2.33337H8.66663V0.366699V0.366699ZM13.6333 2.97337L12.6933 2.03337L11.5 3.2267L12.44 4.1667L13.6333 2.97337ZM11.4933 12.1067L12.6866 13.3067L13.6266 12.3667L12.4266 11.1734L11.4933 12.1067ZM13.3333 7.00003V8.33337H15.3333V7.00003H13.3333ZM7.99996 3.6667C5.79329 3.6667 3.99996 5.46003 3.99996 7.6667C3.99996 9.87337 5.79329 11.6667 7.99996 11.6667C10.2066 11.6667 12 9.87337 12 7.6667C12 5.46003 10.2066 3.6667 7.99996 3.6667ZM7.33329 14.9667H8.66663V13H7.33329V14.9667ZM2.36663 12.36L3.30663 13.3L4.49996 12.1L3.55996 11.16L2.36663 12.36Z" />
                     </svg>
 
                     <svg
                       viewBox="0 0 23 23"
-                      className={`h-[30px] w-[30px] fill-current text-dark dark:hidden ${
+                      className={`h-[30px] w-[30px] fill-current text-dark hover:fill-blue dark:hidden ${
                         !sticky && pathUrl === "/" && "text-white"
                       }`}
                     >

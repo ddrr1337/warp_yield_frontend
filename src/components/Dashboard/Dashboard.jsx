@@ -5,24 +5,15 @@ import { LiaExternalLinkAltSolid } from "react-icons/lia";
 import { IoInformationCircleOutline } from "react-icons/io5";
 
 import { FaArrowRight } from "react-icons/fa";
-import {
-  addressSlaveTestnet,
-  sepoliaMaster,
-} from "@/data/contractTestnetAddresses";
+
 import { dataContracts } from "@/data/dataContracts";
-import { explorersTestnet } from "@/data/explorers";
 import {
   getERC20BalanceFromProvider,
-  getERC20Balance,
-  getAvaliableToWithdraw,
   getAvaliableToWithdrawFromProvider,
+  switchNetwork,
 } from "@/components/metamask/Metamask";
 import Link from "next/link";
-import { useEffect, useState } from "react";
-import {
-  arbitrumSepoliaProviderAlchemyUrl,
-  sepoliaProviderAlchemyUrl,
-} from "@/data/providers";
+import { use, useEffect, useState } from "react";
 import DepositModal from "@/components/modals/DepositModal";
 import WithdrawModal from "@/components/modals/WithdrawModal";
 import { useMetaMask } from "metamask-react";
@@ -30,6 +21,8 @@ import { connected } from "process";
 
 const Dashboard = () => {
   const activeNodeChain = "arbitrum";
+  const activeNodeChainId = 421614;
+  const masterChainId = 11155111;
 
   const { status, connect, account, chainId, ethereum } = useMetaMask();
   const [vaultBalance, setVaultBalance] = useState(0);
@@ -42,40 +35,61 @@ const Dashboard = () => {
   const userChainId = chainId && parseInt(chainId, 16);
 
   useEffect(() => {
-    getERC20BalanceFromProvider(
-      addressSlaveTestnet[activeNodeChain].ausdc,
-      arbitrumSepoliaProviderAlchemyUrl,
-      addressSlaveTestnet[activeNodeChain].slave,
-    ).then((response) => {
-      setVaultBalance(response);
-    });
+    if (activeNodeChainId) {
+      getERC20BalanceFromProvider(
+        dataContracts[activeNodeChainId].ausdc,
+        dataContracts[activeNodeChainId].provider.alchemy,
+        dataContracts[activeNodeChainId].slave,
+      ).then((response) => {
+        setVaultBalance(response);
+      });
+    }
+  }, [activeNodeChainId]);
+
+  useEffect(() => {
+    const getDepositTransactions = async () => {
+      // Consulta todos los eventos de depósito del usuario
+      const filter = {
+        address: dataContracts[activeNodeChainId].slave,
+        topics: [
+          ethers.utils.id("Deposit(address,uint256)"),
+          ethers.utils.hexZeroPad(account, 32),
+        ],
+        fromBlock: 0, // Puedes especificar el bloque inicial
+        toBlock: "latest",
+      };
+      const logs = await provider.getLogs(filter);
+      return logs;
+    };
   }, []);
 
   useEffect(() => {
-    if (account) {
+    if (account && activeNodeChainId) {
       getERC20BalanceFromProvider(
-        addressSlaveTestnet[activeNodeChain].usdc,
-        arbitrumSepoliaProviderAlchemyUrl,
+        dataContracts[activeNodeChainId].usdc,
+        dataContracts[activeNodeChainId].provider.alchemy,
         account,
       ).then((response) => {
         setUsdcUserBalance(response);
       });
 
       getERC20BalanceFromProvider(
-        sepoliaMaster,
-        sepoliaProviderAlchemyUrl,
+        dataContracts[masterChainId].master,
+        dataContracts[masterChainId].provider.alchemy,
         account,
       ).then((response) => {
         setAWRPUserBalance(response);
-        getAvaliableToWithdrawFromProvider(
-          addressSlaveTestnet[activeNodeChain].slave,
+        if (response != 0) {
+          getAvaliableToWithdrawFromProvider(
+            dataContracts[activeNodeChainId].slave,
 
-          arbitrumSepoliaProviderAlchemyUrl,
-          response,
-        ).then((response) => setAvaliableToWithdraw(response));
+            dataContracts[activeNodeChainId].provider.alchemy,
+            response,
+          ).then((response) => setAvaliableToWithdraw(response));
+        }
       });
     }
-  }, [account]);
+  }, [account, activeNodeChainId]);
 
   useEffect(() => {
     setDepositModal(false);
@@ -200,18 +214,24 @@ const Dashboard = () => {
                             <div className="flex justify-center">
                               <button
                                 onClick={() => {
-                                  account ? setDepositModal(true) : connect();
+                                  account
+                                    ? chainId != activeNodeChainId
+                                      ? switchNetwork(activeNodeChainId)
+                                      : setDepositModal(true)
+                                    : connect();
                                 }}
-                                type="submit"
                                 className="inline-flex items-center justify-center rounded-[4px] bg-primary px-3 py-2 text-sm  font-medium text-white transition duration-300 ease-in-out hover:bg-primary/90"
                               >
                                 Deposit
                               </button>
                               <button
                                 onClick={() => {
-                                  account ? setWithdrawModal(true) : connect();
+                                  account
+                                    ? chainId != masterChainId
+                                      ? switchNetwork(masterChainId)
+                                      : setWithdrawModal(true)
+                                    : connect();
                                 }}
-                                type="submit"
                                 className="ml-2 inline-flex items-center justify-center rounded-[4px] bg-primary px-3 py-2 text-sm font-medium text-white transition duration-300 ease-in-out hover:bg-primary/90"
                               >
                                 Withdraw
@@ -242,19 +262,19 @@ const Dashboard = () => {
                   </div>
                   <div className="flex">
                     <Image
-                      src={explorersTestnet[activeNodeChain].icon}
+                      src={dataContracts[activeNodeChainId].icon}
                       alt="chainImg"
                       height={20}
                       width={20}
                       className="mr-2"
                     />
                     <div className="block pt-1 text-sm text-dark dark:text-white">
-                      {`${addressSlaveTestnet[activeNodeChain].slave.slice(0, 12)}...${addressSlaveTestnet[
-                        activeNodeChain
+                      {`${dataContracts[activeNodeChainId].slave.slice(0, 12)}...${dataContracts[
+                        activeNodeChainId
                       ].slave.slice(-12)}`}
                     </div>
                     <Link
-                      href={`${explorersTestnet[activeNodeChain].explorer}address/${addressSlaveTestnet[activeNodeChain].slave}`}
+                      href={`${dataContracts[activeNodeChainId].explorer}address/${dataContracts[activeNodeChainId].slave}`}
                       target="_blank"
                     >
                       <LiaExternalLinkAltSolid className="ml-1 mt-1 cursor-pointer hover:text-blue" />
@@ -316,20 +336,24 @@ const Dashboard = () => {
           </div>
         </div>
       </div>
-      {depositModal &&
-        vaultBalance > 0 &&
-        dataContracts[userChainId]?.chainName == "arbitrum_sepolia" && (
-          <DepositModal
-            depositModal={depositModal}
-            setDepositModal={setDepositModal}
-            vaultBalance={vaultBalance}
-          />
-        )}
+      {depositModal && chainId == activeNodeChainId && (
+        <DepositModal
+          depositModal={depositModal}
+          setDepositModal={setDepositModal}
+          vaultBalance={vaultBalance}
+          account={account}
+          activeNodeChainId={activeNodeChainId}
+          masterChainId={masterChainId}
+        />
+      )}
       {withdrawModal && dataContracts[userChainId]?.chainName == "sepolia" && (
         <WithdrawModal
           withdrawModal={withdrawModal}
           setWithrawModal={setWithdrawModal}
           userChainId={userChainId}
+          activeNodeChainId={activeNodeChainId}
+          account={account}
+          masterChainId={masterChainId}
         />
       )}
     </section>

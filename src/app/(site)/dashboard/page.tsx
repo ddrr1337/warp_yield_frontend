@@ -7,7 +7,7 @@ export const metadata: Metadata = {
   description: "This is contact page description",
 };
 
-const ContactPage = () => {
+const DashboardPage = () => {
   return (
     <>
       <Dashboard />
@@ -15,4 +15,4 @@ const ContactPage = () => {
   );
 };
 
-export default ContactPage;
+export default DashboardPage;

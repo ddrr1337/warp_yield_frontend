@@ -1,0 +1,198 @@
+{
+  "abi": [
+    {
+      "inputs": [
+        {
+          "internalType": "bytes",
+          "name": "message",
+          "type": "bytes"
+        },
+        {
+          "internalType": "bytes",
+          "name": "attestation",
+          "type": "bytes"
+        }
+      ],
+      "name": "receiveMessage",
+      "outputs": [
+        {
+          "internalType": "bool",
+          "name": "success",
+          "type": "bool"
+        }
+      ],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    }
+  ],
+  "ast": {
+    "absolutePath": "interfaces/IMessageTransmitter.sol",
+    "exportedSymbols": {
+      "IMessageTransmitter": [
+        12
+      ]
+    },
+    "id": 13,
+    "license": "Apache-2.0",
+    "nodeType": "SourceUnit",
+    "nodes": [
+      {
+        "id": 1,
+        "literals": [
+          "solidity",
+          "^",
+          "0.8",
+          ".19"
+        ],
+        "nodeType": "PragmaDirective",
+        "src": "39:24:0"
+      },
+      {
+        "abstract": false,
+        "baseContracts": [],
+        "canonicalName": "IMessageTransmitter",
+        "contractDependencies": [],
+        "contractKind": "interface",
+        "fullyImplemented": false,
+        "id": 12,
+        "linearizedBaseContracts": [
+          12
+        ],
+        "name": "IMessageTransmitter",
+        "nameLocation": "75:19:0",
+        "nodeType": "ContractDefinition",
+        "nodes": [
+          {
+            "documentation": {
+              "id": 2,
+              "nodeType": "StructuredDocumentation",
+              "src": "101:1432:0",
+              "text": " @notice Receive a message. Messages with a given nonce\n can only be broadcast once for a (sourceDomain, destinationDomain)\n pair. The message body of a valid message is passed to the\n specified recipient for further processing.\n @dev Attestation format:\n A valid attestation is the concatenated 65-byte signature(s) of exactly\n `thresholdSignature` signatures, in increasing order of the attester address recovered from signatures.\n ***If the attester addresses recovered from signatures are not in increasing order, signature verification will fail.***\n If incorrect number of signatures or duplicate signatures are supplied, signature verification will fail.\n Message format:\n Field                 Bytes      Type       Index\n version               4          uint32     0\n sourceDomain          4          uint32     4\n destinationDomain     4          uint32     8\n nonce                 8          uint64     12\n sender                32         bytes32    20\n recipient             32         bytes32    52\n messageBody           dynamic    bytes      84\n @param message Message bytes\n @param attestation Concatenated 65-byte signature(s) of `message`, in increasing order\n of the attester address recovered from signatures.\n @return success bool, true if successful"
+            },
+            "functionSelector": "57ecfd28",
+            "id": 11,
+            "implemented": false,
+            "kind": "function",
+            "modifiers": [],
+            "name": "receiveMessage",
+            "nameLocation": "1547:14:0",
+            "nodeType": "FunctionDefinition",
+            "parameters": {
+              "id": 7,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 4,
+                  "mutability": "mutable",
+                  "name": "message",
+                  "nameLocation": "1586:7:0",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 11,
+                  "src": "1571:22:0",
+                  "stateVariable": false,
+                  "storageLocation": "calldata",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_bytes_calldata_ptr",
+                    "typeString": "bytes"
+                  },
+                  "typeName": {
+                    "id": 3,
+                    "name": "bytes",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "1571:5:0",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_bytes_storage_ptr",
+                      "typeString": "bytes"
+                    }
+                  },
+                  "visibility": "internal"
+                },
+                {
+                  "constant": false,
+                  "id": 6,
+                  "mutability": "mutable",
+                  "name": "attestation",
+                  "nameLocation": "1618:11:0",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 11,
+                  "src": "1603:26:0",
+                  "stateVariable": false,
+                  "storageLocation": "calldata",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_bytes_calldata_ptr",
+                    "typeString": "bytes"
+                  },
+                  "typeName": {
+                    "id": 5,
+                    "name": "bytes",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "1603:5:0",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_bytes_storage_ptr",
+                      "typeString": "bytes"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "1561:74:0"
+            },
+            "returnParameters": {
+              "id": 10,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 9,
+                  "mutability": "mutable",
+                  "name": "success",
+                  "nameLocation": "1659:7:0",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 11,
+                  "src": "1654:12:0",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_bool",
+                    "typeString": "bool"
+                  },
+                  "typeName": {
+                    "id": 8,
+                    "name": "bool",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "1654:4:0",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_bool",
+                      "typeString": "bool"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "1653:14:0"
+            },
+            "scope": 12,
+            "src": "1538:130:0",
+            "stateMutability": "nonpayable",
+            "virtual": false,
+            "visibility": "external"
+          }
+        ],
+        "scope": 13,
+        "src": "65:1605:0",
+        "usedErrors": []
+      }
+    ],
+    "src": "39:1632:0"
+  },
+  "contractName": "IMessageTransmitter",
+  "dependencies": [],
+  "offset": [
+    65,
+    1670
+  ],
+  "sha1": "b4db27087eaaa562b9b5afdad7f6c159b8b1f588",
+  "source": "// SPDX-License-Identifier: Apache-2.0\npragma solidity ^0.8.19;\n\ninterface IMessageTransmitter {\n    /**\n     * @notice Receive a message. Messages with a given nonce\n     * can only be broadcast once for a (sourceDomain, destinationDomain)\n     * pair. The message body of a valid message is passed to the\n     * specified recipient for further processing.\n     *\n     * @dev Attestation format:\n     * A valid attestation is the concatenated 65-byte signature(s) of exactly\n     * `thresholdSignature` signatures, in increasing order of the attester address recovered from signatures.\n     * ***If the attester addresses recovered from signatures are not in increasing order, signature verification will fail.***\n     * If incorrect number of signatures or duplicate signatures are supplied, signature verification will fail.\n     *\n     * Message format:\n     * Field                 Bytes      Type       Index\n     * version               4          uint32     0\n     * sourceDomain          4          uint32     4\n     * destinationDomain     4          uint32     8\n     * nonce                 8          uint64     12\n     * sender                32         bytes32    20\n     * recipient             32         bytes32    52\n     * messageBody           dynamic    bytes      84\n     * @param message Message bytes\n     * @param attestation Concatenated 65-byte signature(s) of `message`, in increasing order\n     * of the attester address recovered from signatures.\n     * @return success bool, true if successful\n     */\n    function receiveMessage(\n        bytes calldata message,\n        bytes calldata attestation\n    ) external returns (bool success);\n}\n",
+  "type": "interface"
+}

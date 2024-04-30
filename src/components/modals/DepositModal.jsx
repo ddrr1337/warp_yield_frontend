@@ -8,29 +8,34 @@ import {
   getERC20Allowance,
   approveERC20,
   depositUSDC,
+  getLinkFeesDeposit,
 } from "@/components/metamask/Metamask";
-import {
-  addressSlaveTestnet,
-  sepoliaMaster,
-} from "@/data/contractTestnetAddresses";
-import { useMetaMask } from "metamask-react";
-import { sepoliaProviderAlchemyUrl } from "@/data/providers";
-import Loading from "@/components/Common/Loading";
-import { explorersTestnet, cahinLinkCCIP } from "@/data/explorers";
 
-const DepositModal = ({ depositModal, setDepositModal, vaultBalance }) => {
-  const activeNodeChain = "arbitrum";
+import { dataContracts, cahinLinkCCIPExplorer } from "@/data/dataContracts";
+import Loading from "@/components/Common/Loading";
+import { IoInformationCircleOutline } from "react-icons/io5";
+import { LuRefreshCw } from "react-icons/lu";
+
+const DepositModal = ({
+  depositModal,
+  setDepositModal,
+  vaultBalance,
+  account,
+  activeNodeChainId,
+  masterChainId,
+}) => {
   const [depositUsdc, setDepositUsdc] = useState(0);
   const [usdcUserBalance, setUsdcUserBalance] = useState(0);
   const [AWRPUserBalance, setAWRPUserBalance] = useState(0);
   const [AWRPTotalSupply, setAWRPTotalSupply] = useState(0);
   const [usdcAllowance, setUsdcAllowance] = useState(0);
+  const [linkAllowance, setLinkAllowance] = useState(0);
   const [txHash, setTxHash] = useState(null);
   const [isDepositTx, setIsDepositTx] = useState(false);
-
   const [isSendingTx, setIsSendingTx] = useState(false);
-
-  const { status, connect, account, chainId, ethereum } = useMetaMask();
+  const [linkFeeRequired, setLinkFeeRequired] = useState(0);
+  const [isSendingLinkApproval, setIsSendingLinkAproval] = useState(false);
+  const [refreshing, setRefreshing] = useState(false);
 
   const handleInput = (e) => {
     let value = e.target.value;
@@ -44,14 +49,14 @@ const DepositModal = ({ depositModal, setDepositModal, vaultBalance }) => {
     setDepositUsdc(value);
   };
 
-  const handleApprove = async () => {
+  const handleApproveUsdc = async () => {
     try {
       setIsDepositTx(false);
       setTxHash(null);
       setIsSendingTx(true);
       const tx = await approveERC20(
-        addressSlaveTestnet[activeNodeChain].usdc,
-        addressSlaveTestnet[activeNodeChain].slave,
+        dataContracts[activeNodeChainId].usdc,
+        dataContracts[activeNodeChainId].slave,
         depositUsdc,
         10 ** 6,
       );
@@ -59,9 +64,9 @@ const DepositModal = ({ depositModal, setDepositModal, vaultBalance }) => {
         setTxHash(tx);
         await tx.wait();
         const response = await getERC20Allowance(
-          addressSlaveTestnet[activeNodeChain].usdc,
+          dataContracts[activeNodeChainId].usdc,
           account,
-          addressSlaveTestnet[activeNodeChain].slave,
+          dataContracts[activeNodeChainId].slave,
         );
         setUsdcAllowance(response);
       }
@@ -72,29 +77,63 @@ const DepositModal = ({ depositModal, setDepositModal, vaultBalance }) => {
     }
   };
 
+  const handleApproveLink = async () => {
+    try {
+      setIsDepositTx(false);
+      setTxHash(null);
+      setIsSendingLinkAproval(true);
+      const tx = await approveERC20(
+        dataContracts[activeNodeChainId].link,
+        dataContracts[activeNodeChainId].slave,
+        linkFeeRequired * 1.2,
+        1,
+      );
+      if (tx && tx.wait) {
+        setTxHash(tx);
+        await tx.wait();
+        const response = await getERC20Allowance(
+          dataContracts[activeNodeChainId].link,
+          account,
+          dataContracts[activeNodeChainId].slave,
+        );
+        setLinkAllowance(response);
+      }
+    } catch (error) {
+      console.error("Error approving USDC:", error);
+    } finally {
+      setIsSendingLinkAproval(false);
+    }
+  };
+
   const handleDeposit = async () => {
     try {
       setIsDepositTx(true);
       setTxHash(null);
       setIsSendingTx(true);
       const tx = await depositUSDC(
-        addressSlaveTestnet[activeNodeChain].slave,
+        dataContracts[activeNodeChainId].slave,
         depositUsdc,
       );
       if (tx && tx.wait) {
         setTxHash(tx);
         await tx.wait();
         const responseAllowance = await getERC20Allowance(
-          addressSlaveTestnet[activeNodeChain].usdc,
+          dataContracts[activeNodeChainId].usdc,
           account,
-          addressSlaveTestnet[activeNodeChain].slave,
+          dataContracts[activeNodeChainId].slave,
         );
         setUsdcAllowance(responseAllowance);
         const responseBalanceUsdc = await getERC20Balance(
-          addressSlaveTestnet[activeNodeChain].usdc,
+          dataContracts[activeNodeChainId].usdc,
           account,
         );
         setUsdcUserBalance(responseBalanceUsdc);
+        const responseLinkAllowance = await getERC20Allowance(
+          dataContracts[activeNodeChainId].link,
+          account,
+          dataContracts[activeNodeChainId].slave,
+        );
+        setLinkAllowance(responseLinkAllowance);
       }
     } catch (error) {
       console.error("Error depositing USDC:", error);
@@ -108,28 +147,43 @@ const DepositModal = ({ depositModal, setDepositModal, vaultBalance }) => {
     return shares / 10 ** 12;
   };
 
+  const getCurrentLinkFees = () => {
+    getLinkFeesDeposit(dataContracts[activeNodeChainId].slave, account).then(
+      (response) => {
+        setLinkFeeRequired(response);
+      },
+    );
+  };
+
   useEffect(() => {
     if (account) {
-      getERC20Balance(addressSlaveTestnet[activeNodeChain].usdc, account).then(
+      getERC20Balance(dataContracts[activeNodeChainId].usdc, account).then(
         (response) => setUsdcUserBalance(response),
       );
-      getTotalSupplyAWRPSlaveView(
-        addressSlaveTestnet[activeNodeChain].slave,
-      ).then((response) => {
-        setAWRPTotalSupply(response);
-      });
+      getTotalSupplyAWRPSlaveView(dataContracts[activeNodeChainId].slave).then(
+        (response) => {
+          setAWRPTotalSupply(response);
+        },
+      );
       getERC20BalanceFromProvider(
-        sepoliaMaster,
-        sepoliaProviderAlchemyUrl,
+        dataContracts[masterChainId].master,
+        dataContracts[masterChainId].provider.alchemy,
         account,
       ).then((response) => {
         setAWRPUserBalance(response);
       });
       getERC20Allowance(
-        addressSlaveTestnet[activeNodeChain].usdc,
+        dataContracts[activeNodeChainId].usdc,
         account,
-        addressSlaveTestnet[activeNodeChain].slave,
+        dataContracts[activeNodeChainId].slave,
       ).then((response) => setUsdcAllowance(response));
+      getCurrentLinkFees();
+
+      getERC20Allowance(
+        dataContracts[activeNodeChainId].link,
+        account,
+        dataContracts[activeNodeChainId].slave,
+      ).then((response) => setLinkAllowance(response));
     }
   }, [account]);
 
@@ -147,12 +201,11 @@ const DepositModal = ({ depositModal, setDepositModal, vaultBalance }) => {
               <div>
                 <div className="flex items-center">
                   <h3 className="flex text-lg font-semibold text-gray-900 dark:text-white">
-                    Deposit USDC On{" "}
-                    {activeNodeChain.charAt(0).toUpperCase() +
-                      activeNodeChain.slice(1)}
+                    Deposit <span className="mx-1 text-blue">USDC</span> On{" "}
+                    {dataContracts[activeNodeChainId].formatedName}
                     <span>
                       <Image
-                        src={`/images/${activeNodeChain}.svg`}
+                        src={dataContracts[activeNodeChainId].icon}
                         alt="usdcIcon"
                         height={25}
                         width={25}
@@ -178,9 +231,9 @@ const DepositModal = ({ depositModal, setDepositModal, vaultBalance }) => {
                 >
                   <path
                     stroke="currentColor"
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    stroke-width="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth="2"
                     d="m1 1 6 6m0 0 6 6M7 7l6-6M7 7l-6 6"
                   />
                 </svg>
@@ -192,17 +245,13 @@ const DepositModal = ({ depositModal, setDepositModal, vaultBalance }) => {
               <div className="mb-4 grid grid-cols-2 gap-4">
                 <div className="col-span-2">
                   <div className="flex justify-between">
-                    <label
-                      for="name"
-                      className="mb-2 ml-1 block text-sm font-medium text-gray-900 dark:text-white"
-                    >
+                    <label className="mb-2 ml-1 block text-sm font-medium text-gray-900 dark:text-white">
                       Select Deposit Amount
                     </label>
                     <button
                       onClick={() =>
                         setDepositUsdc(parseFloat(usdcUserBalance / 10 ** 6))
                       }
-                      for="name"
                       className=" flex items-center text-xs font-medium text-blue-700 dark:text-blue-500"
                     >
                       Balance {parseFloat(usdcUserBalance / 10 ** 6).toFixed(2)}
@@ -232,10 +281,7 @@ const DepositModal = ({ depositModal, setDepositModal, vaultBalance }) => {
                   />
                 </div>
                 <div className="col-span-2 sm:col-span-1">
-                  <label
-                    for="price"
-                    className="mb-2  ml-1 flex text-xs font-medium text-gray-900 dark:text-white"
-                  >
+                  <label className="mb-2  ml-1 flex text-xs font-medium text-gray-900 dark:text-white">
                     You Will Get aWRP On{" "}
                     <span>
                       <Image
@@ -260,13 +306,10 @@ const DepositModal = ({ depositModal, setDepositModal, vaultBalance }) => {
                   </div>
                 </div>
                 <div className="col-span-2 sm:col-span-1">
-                  <label
-                    for="price"
-                    className="mb-2 ml-1 block text-xs font-medium text-gray-900 dark:text-white"
-                  >
+                  <label className="mb-2 ml-1 block text-xs font-medium text-gray-900 dark:text-white">
                     You Will Deposit
                   </label>
-                  <div className="focus:ring-primary-600 focus:border-primary-600 dark:focus:ring-primary-500 dark:focus:border-primary-500 block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-sm text-gray-900 dark:border-gray-500 dark:bg-gray-600 dark:text-white dark:placeholder-gray-400">
+                  <div className="focus:ring-primary-600 focus:border-primary-600 dark:focus:ring-primary-500 dark:focus:border-primary-500 block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-sm text-blue-700 dark:border-gray-500  dark:bg-gray-600 dark:text-blue-400  dark:placeholder-gray-400">
                     {depositUsdc}{" "}
                     <span className="text-[10px] text-blue-700 dark:text-blue-400">
                       USDC
@@ -292,6 +335,77 @@ const DepositModal = ({ depositModal, setDepositModal, vaultBalance }) => {
                     </span>
                   </div>
                 </div>
+
+                <div className="col-span-2 sm:col-span-1">
+                  <label className="mb-2 ml-1 block text-xs font-medium text-gray-900 dark:text-white">
+                    Current Fee For Deposit
+                  </label>
+                  <div
+                    className={` focus:ring-primary-600 focus:border-primary-600 dark:focus:ring-primary-500 dark:focus:border-primary-500 block flex w-full justify-between rounded-lg border   ${linkFeeRequired > linkAllowance ? "border-red" : "border-gray-300"} bg-gray-50 p-2.5 text-sm text-gray-900 dark:border-gray-500 dark:bg-gray-600 dark:text-white dark:placeholder-gray-400`}
+                  >
+                    <div
+                      className={`${refreshing && " animate-bounce opacity-50"}`}
+                    >
+                      {parseFloat(linkFeeRequired / 10 ** 18).toFixed(5)}{" "}
+                      <span className="text-[10px]">LINK</span>
+                    </div>
+
+                    <button
+                      onClick={() => {
+                        setRefreshing(true);
+                        getCurrentLinkFees();
+
+                        // Agrega un retardo de 1 segundo antes de cambiar refreshing a false
+                        setTimeout(() => {
+                          setRefreshing(false);
+                        }, 1000); // 1000 milisegundos = 1 segundo
+                      }}
+                    >
+                      <LuRefreshCw className=" transform transition duration-300 ease-in-out hover:rotate-180 focus:opacity-50" />
+                    </button>
+                  </div>
+                </div>
+                <div className="col-span-2 sm:col-span-1">
+                  <button
+                    onClick={() => handleApproveLink()}
+                    className={`  
+                   " mt-6 w-40 items-center rounded-[4px] bg-blue-700 px-3 py-1.5 text-center text-xs font-medium text-white hover:bg-blue-800 focus:outline-none focus:ring-4 focus:ring-blue-300 
+                   dark:bg-blue-600 dark:hover:bg-blue-700
+                   dark:focus:ring-blue-800
+                  `}
+                  >
+                    {isSendingLinkApproval ? (
+                      <Loading />
+                    ) : (
+                      <div className="flex justify-center">
+                        Approve Some Link{" "}
+                        <span>
+                          <IoInformationCircleOutline
+                            size={15}
+                            className="ml-1"
+                          />
+                        </span>{" "}
+                      </div>
+                    )}
+                  </button>
+                  <div className="ml-1 mt-1 flex text-xs ">
+                    Allowed:{" "}
+                    <span className="ml-1 ">
+                      {(linkAllowance / 10 ** 18).toFixed(5)}
+                    </span>{" "}
+                    <span>
+                      <Image
+                        src={`/images/link.svg`}
+                        alt="usdcIcon"
+                        height={13}
+                        width={13}
+                        className="mx-1 "
+                      />
+                    </span>{" "}
+                    <span className="">LINK</span>
+                  </div>
+                </div>
+
                 <div className="col-span-2">
                   <label className="mb-2 ml-1 block text-sm font-medium text-gray-900 dark:text-white">
                     Important Information
@@ -310,7 +424,7 @@ const DepositModal = ({ depositModal, setDepositModal, vaultBalance }) => {
               </div>
               {usdcAllowance < depositUsdc * 10 ** 6 ? (
                 <button
-                  onClick={() => handleApprove()}
+                  onClick={() => handleApproveUsdc()}
                   className={`  
                  " w-40 items-center rounded-[4px] bg-blue-700 px-5 py-2.5 text-center text-sm font-medium text-white hover:bg-blue-800 focus:outline-none focus:ring-4 focus:ring-blue-300 dark:bg-blue-600 dark:hover:bg-blue-700 
                  dark:focus:ring-blue-800
@@ -321,9 +435,10 @@ const DepositModal = ({ depositModal, setDepositModal, vaultBalance }) => {
               ) : (
                 <button
                   onClick={() => handleDeposit()}
+                  disabled={depositUsdc == 0}
                   className={`  
                    " w-40 items-center rounded-[4px] bg-blue-700 px-5 py-2.5 text-center text-sm font-medium text-white hover:bg-blue-800 focus:outline-none focus:ring-4 focus:ring-blue-300 dark:bg-blue-600 dark:hover:bg-blue-700 
-                   dark:focus:ring-blue-800
+                   dark:focus:ring-blue-800 ${depositUsdc == 0 && "opacity-50"}
                   `}
                 >
                   {!isSendingTx ? "Deposit USDC" : <Loading />}
@@ -337,7 +452,7 @@ const DepositModal = ({ depositModal, setDepositModal, vaultBalance }) => {
                   </div>
                   <div className="mt-2 flex justify-center text-sm">
                     <Image
-                      src={`/images/${activeNodeChain}.svg`}
+                      src={dataContracts[activeNodeChainId].icon}
                       alt="usdcIcon"
                       height={20}
                       width={20}
@@ -348,7 +463,7 @@ const DepositModal = ({ depositModal, setDepositModal, vaultBalance }) => {
 
                   <div className="mt-1 flex justify-center text-sm">
                     <Link
-                      href={`${explorersTestnet[activeNodeChain].explorer}tx/${txHash.hash}`}
+                      href={`${dataContracts[activeNodeChainId].explorer}tx/${txHash.hash}`}
                       target="_blank"
                     >
                       <span className="hover:text-violet-500">{`${txHash.hash.slice(
@@ -377,7 +492,7 @@ const DepositModal = ({ depositModal, setDepositModal, vaultBalance }) => {
 
                   <div className="mt-1 flex justify-center text-sm">
                     <Link
-                      href={`${cahinLinkCCIP}${txHash.hash}`}
+                      href={`${cahinLinkCCIPExplorer}${txHash.hash}`}
                       target="_blank"
                     >
                       <span className="hover:text-violet-500">{`${txHash.hash.slice(
