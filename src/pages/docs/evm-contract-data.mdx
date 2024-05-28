@@ -1,0 +1,53 @@
+import {useState,useEffect} from "react"
+import { CopyToClipboard } from 'react-copy-to-clipboard';
+import { MdContentCopy } from "react-icons/md";
+import { FaCheck } from "react-icons/fa6";
+import {dataContracts} from "@/data/dataContracts"
+
+
+export const CopyButton =({ text }) => {
+    const [copied, setCopied] = useState(false);
+
+    useEffect(() => {
+        if (copied) {
+            // Restablece el estado de copiado después de unos segundos
+            const timer = setTimeout(() => setCopied(false), 2000);
+            return () => clearTimeout(timer);
+        }
+    }, [copied]);
+
+    return (
+        <CopyToClipboard text={text} onCopy={() => setCopied(true)}>
+            <button >{!copied?<MdContentCopy className="-mb-0.5 ml-1"/>:<FaCheck className="-mb-0.5 ml-1"/>}</button>
+        </CopyToClipboard>
+    );
+}
+
+
+
+
+# EVM Contract Data
+
+
+### TESTNETS
+
+#### MASTER
+
+<div className="text-xs mt-10">
+| BlockChain TESTNETS |  CCIPid TESTNETS| Master address TESTNETS|
+| :----- | :----: | :----: |
+| Arbitrum Sepolia | <div className="flex flex-nowrap">{dataContracts[11155111].chainIdCCIP}<CopyButton text={dataContracts[11155111].chainIdCCIP} /></div>|<div className="flex flex-nowrap"><span className="-mb-0.5 text-blue">{dataContracts[11155111].master}</span><CopyButton text={dataContracts[11155111].master} /></div>|
+
+</div>
+
+#### NODES
+
+<div className="text-xs mt-10">
+| BlockChain TESTNETS |   CCIPid TESTNETS| Node addresses TESTNETS|
+| :----- | :----: | :----: |
+| Ethereum Sepolia | <div className="flex flex-nowrap">{dataContracts[11155111].chainIdCCIP}<CopyButton text={dataContracts[11155111].chainIdCCIP} /></div>|<div className="flex flex-nowrap"><span className="-mb-0.5 text-blue">{dataContracts[11155111].slave}</span><CopyButton text={dataContracts[11155111].slave} /></div>|
+| Arbitrum Sepolia | <div className="flex flex-nowrap">{dataContracts[421614].chainIdCCIP}<CopyButton text={dataContracts[421614].chainIdCCIP} /></div>|<div className="flex flex-nowrap"><span className="-mb-0.5 text-blue">{dataContracts[421614].slave}</span><CopyButton text={dataContracts[421614].slave} /></div>|
+| Optimistic Sepolia | <div className="flex flex-nowrap">{dataContracts[11155420].chainIdCCIP}<CopyButton text={dataContracts[11155420].chainIdCCIP} /></div>|<div className="flex flex-nowrap"><span className="-mb-0.5 text-blue">{dataContracts[11155420].slave}</span><CopyButton text={dataContracts[11155420].slave} /></div>|
+| Avalanche Fuji | <div className="flex flex-nowrap">{dataContracts[11155420].chainIdCCIP}<CopyButton text={dataContracts[11155420].chainIdCCIP} /></div>|<div className="flex flex-nowrap"><span className="-mb-0.5 text-blue">{dataContracts[11155420].slave}</span><CopyButton text={dataContracts[11155420].slave} /></div>| 
+| Base Sepolia | <div className="flex flex-nowrap">{dataContracts[11155420].chainIdCCIP}<CopyButton text={dataContracts[11155420].chainIdCCIP} /></div>|<div className="flex flex-nowrap"><span className="-mb-0.5 text-blue">{dataContracts[11155420].slave}</span><CopyButton text={dataContracts[11155420].slave} /></div>|
+</div>

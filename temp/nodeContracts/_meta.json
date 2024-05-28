@@ -1,0 +1,8 @@
+{
+  "nodeContractsRoles": "Nodes Contracts roles",
+  "nodeContractsYieldData": "Send yield data to Master",
+  "nodeContractsDeposits": "Deposits",
+  "nodeContractView": "N. Contract view functions",
+  "nodeContractCall": "N. Contract call functions",
+  "nodeContractsData": "Nodes Contracts EVM data"
+}

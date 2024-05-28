@@ -1,0 +1,12 @@
+# Send Yield Data To Master
+
+<div className="my-10">
+This is a <strong> Required command</strong>  in order to make any warp funds
+This function belongs to Warp Fund procedure. [Check out warp procedure.](/docs/masterContractRoles/warp-assets)
+</div>
+
+Sends `totalSupply`, `totalUsdcBorrow` and `supplyRate` from AAVE protocol pool data to master contract can make calculation in order to approve the warp command.
+
+```solidity filename="Node.sol" {}
+    function sendAaveData() external
+```

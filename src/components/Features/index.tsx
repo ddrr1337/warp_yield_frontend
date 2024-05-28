@@ -8,8 +8,8 @@ const Features = () => {
       <div className="container">
         <SectionTitle
           subtitle="Features"
-          title="Main Features Of Play"
-          paragraph="There are many variations of passages of Lorem Ipsum available but the majority have suffered alteration in some form."
+          title="Main Features Of Warp Yield"
+          paragraph="Con Warp Yeild no necesitaras preocuparte por mover tu capital entre blockcahins para obtener el yild mas alto de AAVE, alguien lo hara por ti!!"
         />
 
         <div className="-mx-4 mt-12 flex flex-wrap lg:mt-20">

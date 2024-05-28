@@ -17,7 +17,7 @@ export const bridgeOptions = [
     text: "Optimistic",
     chainId: 11155420,
   },
+  { CCTPid: 6, image: "/images/base.svg", text: "Base", chainId: 84532 },
   { CCTPid: 1, image: "/images/avax.svg", text: "Avalanche" },
   { CCTPid: 7, image: "/images/polygon.svg", text: "Polygon" },
-  { CCTPid: 6, image: "/images/base.svg", text: "Base" },
 ];

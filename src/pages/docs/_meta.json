@@ -1,0 +1,12 @@
+{
+  "basics": "Basics of WarpYield",
+  "structure": "Protocol Structure",
+  "aWRP-token": "aWRP Token",
+  "getting-started": "Getting Started",
+  "masterContractRoles": "Master Contract Roles",
+  "nodeContractRoles": "Nonde Contract Roles",
+  "evm-contract-data": "EVM Contract Data",
+  "usdc-link-addresses": "USDC/LINK Addresses",
+  "bridge": "Bridge",
+  "temp": "Temp"
+}

@@ -1,0 +1,21 @@
+# Warp Requieremts
+
+Once the information from the nodes reaches the master contract, the Warp will be approved if:
+
+#### Information provided by the active node:
+
+1. The active node is a valid node == true.
+2. The active node is an active node == true.
+3. The information received from the active node has not expired (2 hours).
+4. The supply rate of funds deposited in AAVE > 0.
+
+#### Information provided by the destination node:
+
+1. The destination node is a valid node == true.
+2. The destination node is an active node == false.
+3. The information received from the destination node has not expired (2 hours).
+
+
+#### Additional checks:
+
+1. The active node has a lower supply rate than the destination node.

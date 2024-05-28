@@ -1,0 +1,9 @@
+{
+  "masterContractRole": "Master Contract roles",
+  "masterContractAccounts": "Balance accountrs tracking",
+  "masterContractWithdraw": "Withdraws",
+  "masterContractWarp": "Warp Assets",
+  "masterContracView": "M. Contract view functions",
+  "masterContractCall": "M. Contract call functions",
+  "masterContractData": "Master Contract EVM data"
+}

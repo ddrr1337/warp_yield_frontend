@@ -1,0 +1,36 @@
+
+
+
+# Withdraws
+
+Withdrawals will always be made from the Master Contract, as it is the contract that keeps track of user accounting.  
+Once the transaction is initiated in the Master Contract, the withdrawal command will be broadcasted to the Active Node for execution.  
+After execution in the Active Node, the funds will be made available to the user on the blockchain where the Active Node is located.
+
+User only needs to call on Master Contract chain. Link CCIP will automate the reception of the withdraw command when Active Node receive the command.
+
+```solidity filename="Master.sol" {}
+    function withdraw(
+        uint256 shares
+    ) external
+```
+
+#### Input params
+
+<span className="underline">uint256 shares:</span> Amount of aWRP you wanto to withdraw (wei).  
+
+###### Read This!!
+
+While node is warping to one chain to another, <strong>all withdraws will be halted</strong> untill new node becomes active.
+
+#### Refund Withdraw
+
+When the warp order is issued, withdrawals are suspended until the funds are in the next blockchain. There is a possibility that an ongoing withdrawal order made earlier may take longer than usual to transfer, and that when the withdrawal order arrives, the vault funds may no longer be on that blockchain.
+
+Since this infrequent case may occur, the Nodes have a security system in place to ensure the user does not lose their funds in the event this happens. Whenever something like this might occur, this function can be called to recover the aWRP sent to the active node:
+
+```solidity filename="Node.sol" {}
+  function refundWithdraw() external
+```
+
+

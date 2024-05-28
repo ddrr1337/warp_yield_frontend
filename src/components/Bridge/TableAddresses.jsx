@@ -23,10 +23,12 @@ function TableAddresses() {
           </tr>
         </thead>
         <tbody>
-          {contractsArray.map((item) => (
-            <tr className="border-b bg-white hover:bg-gray-50 dark:border-gray-700 dark:bg-gray-800 dark:hover:bg-gray-600">
+          {contractsArray.map((item, index) => (
+            <tr
+              key={index}
+              className="border-b bg-white hover:bg-gray-50 dark:border-gray-700 dark:bg-gray-800 dark:hover:bg-gray-600"
+            >
               <th
-                key={item.CCTPid}
                 scope="row"
                 className="whitespace-nowrap px-6 py-4 text-sm font-medium text-gray-900 dark:text-white"
               >

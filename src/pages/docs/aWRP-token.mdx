@@ -1,0 +1,52 @@
+import {useState,useEffect} from "react"
+import { CopyToClipboard } from 'react-copy-to-clipboard';
+import { MdContentCopy } from "react-icons/md";
+import { FaCheck } from "react-icons/fa6";
+import {dataContracts} from "@/data/dataContracts"
+
+
+export const CopyButton =({ text }) => {
+    const [copied, setCopied] = useState(false);
+
+    useEffect(() => {
+        if (copied) {
+            // Restablece el estado de copiado después de unos segundos
+            const timer = setTimeout(() => setCopied(false), 2000);
+            return () => clearTimeout(timer);
+        }
+    }, [copied]);
+
+    return (
+        <CopyToClipboard text={text} onCopy={() => setCopied(true)}>
+            <button >{!copied?<MdContentCopy className="-mb-0.5 ml-1"/>:<FaCheck className="-mb-0.5 ml-1"/>}</button>
+        </CopyToClipboard>
+    );
+}
+
+
+
+# aWRP Token
+
+
+Warp Yield uses the aWRP token to keep track of the accounting for protocol users.
+
+The aWRP token functions similarly to the aUSDC token received when a user makes a deposit in AAVE.
+
+It is a token that includes the provided yield, which means its value will increase depending on the returns being applied to the vault.
+
+The aWRP token only exists on the blockchain where the master contract is hosted.
+
+Once a user makes a deposit in the active node, the node will add the deposited USDC to the vault, increasing the TVL (Total Value Locked) of the protocol. The active node will calculate the corresponding aWRP for the deposit made and broadcast the aWRP new tokens to the master contract.
+
+Once the aWRP tokens reaches the master contract, it will immediately and automatically mint the corresponding aWRP for the user on the blockchain of the master contract.
+
+
+
+Since the master contract is also an ERC20 contract, the address of the aWRP token and the master contract are the same.  
+
+<div className="text-xs mt-10">
+| BlockChain TESTNET  | aWRP/master Contract Address TESTNET |
+| :----- | :----: | 
+| Ethereum Sepolia |<div className="flex flex-nowrap"><span className="-mb-0.5 text-blue">{dataContracts[11155111].master}</span><CopyButton text={dataContracts[11155111].master} /></div>|
+
+</div>

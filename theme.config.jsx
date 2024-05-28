@@ -1,5 +1,9 @@
 export default {
-  logo: <span>WarpYield Documentation</span>,
+  logo: (
+    <div>
+      <span>WarpYield Docs</span>
+    </div>
+  ),
   project: {
     link: "https://github.com/shuding/nextra",
   },

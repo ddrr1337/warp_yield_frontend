@@ -1,0 +1,59 @@
+import {useState,useEffect} from "react"
+import { CopyToClipboard } from 'react-copy-to-clipboard';
+import { MdContentCopy } from "react-icons/md";
+import { FaCheck } from "react-icons/fa6";
+import {dataContracts} from "@/data/dataContracts"
+
+
+export const CopyButton =({ text }) => {
+    const [copied, setCopied] = useState(false);
+
+    useEffect(() => {
+        if (copied) {
+            // Restablece el estado de copiado después de unos segundos
+            const timer = setTimeout(() => setCopied(false), 2000);
+            return () => clearTimeout(timer);
+        }
+    }, [copied]);
+
+    return (
+        <CopyToClipboard text={text} onCopy={() => setCopied(true)}>
+            <button >{!copied?<MdContentCopy className="-mb-0.5 ml-1"/>:<FaCheck className="-mb-0.5 ml-1"/>}</button>
+        </CopyToClipboard>
+    );
+}
+
+
+
+
+# Deposits
+
+<div className="my-10">
+Deposits will <strong>always be made in the active node</strong>, as it is where the funds of the vault reside at that moment.  
+Once the deposit is made, the Active Node will calculate the shares (aWRP) due to the user for their deposit, and will immediately broadcast the balance to the master contract.  
+Once the deposit command reaches the Master Contract, the master contract will mint the corresponding aWRP tokens for the user on the blockchain of the master contract.  
+</div>
+
+<strong>Example:</strong>
+
+
+1. A user deposits 1000 USDC in the active node on the Optimistic network.  
+2. The Active Node determines the amount of aWRP corresponding to that deposit and broadcast the amount of aWRP to the master contract on Arbitrum.  
+3. The message is received by the Master Contract on the Ethereum network, and the corresponding aWRP tokens are automatically minted for the user on the Arbitrum network.
+
+
+```solidity filename="Node.sol" {}
+    function deposit(uint256 amount) external
+```
+
+#### Input params
+
+
+<span className="underline">uint256 amount:</span> Amount of USDC you want to depost (wei).  
+
+
+
+
+
+
+
