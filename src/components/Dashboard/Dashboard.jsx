@@ -6,11 +6,18 @@ import { IoInformationCircleOutline } from "react-icons/io5";
 
 import { FaArrowRight } from "react-icons/fa";
 
-import { dataContracts } from "@/data/dataContracts";
 import {
+  dataContracts,
+  masterChainId,
+  getChainIdByChainIdCCIP,
+} from "@/data/dataContracts";
+import {
+  getIsWarpingNodeFromProvider,
+  getActiveNodeChainIdCCIP,
   getERC20BalanceFromProvider,
   getAvaliableToWithdrawFromProvider,
   switchNetwork,
+  getNodeAaveSupplyRate,
 } from "@/components/metamask/Metamask";
 import Link from "next/link";
 import { use, useEffect, useState } from "react";
@@ -20,9 +27,7 @@ import { useMetaMask } from "metamask-react";
 import { connected } from "process";
 
 const Dashboard = () => {
-  const activeNodeChain = "arbitrum";
-  const activeNodeChainId = 421614;
-  const masterChainId = 11155111;
+  const [activeNodeChainId, setActiveNodeChainId] = useState(null);
 
   const { status, connect, account, chainId, ethereum } = useMetaMask();
   const [vaultBalance, setVaultBalance] = useState(0);
@@ -30,18 +35,44 @@ const Dashboard = () => {
   const [withdrawModal, setWithdrawModal] = useState(false);
   const [usdcUserBalance, setUsdcUserBalance] = useState(0);
   const [AWRPUserBalance, setAWRPUserBalance] = useState(0);
+  const [supplyRate, setSupplyRate] = useState(0);
   const [avaliableToWithdraw, setAvaliableToWithdraw] = useState(0);
+  const [isWarping, setIsWarping] = useState(false);
 
   const userChainId = chainId && parseInt(chainId, 16);
 
+  const RAY = 10 ** 27;
+  const SECONDS_PER_YEAR = 31536000;
+
+  useEffect(() => {
+    if (activeNodeChainId) {
+      getIsWarpingNodeFromProvider().then((response) => setIsWarping(response));
+    }
+  }, [activeNodeChainId]);
+
+  useEffect(() => {
+    getActiveNodeChainIdCCIP(
+      dataContracts[masterChainId].master,
+      dataContracts[masterChainId].provider.alchemy,
+    ).then((response) => {
+      const chainId = getChainIdByChainIdCCIP(parseInt(response));
+      setActiveNodeChainId(parseInt(chainId));
+    });
+  }, []);
   useEffect(() => {
     if (activeNodeChainId) {
       getERC20BalanceFromProvider(
         dataContracts[activeNodeChainId].ausdc,
         dataContracts[activeNodeChainId].provider.alchemy,
-        dataContracts[activeNodeChainId].slave,
+        dataContracts[activeNodeChainId].node,
       ).then((response) => {
         setVaultBalance(response);
+      });
+      getNodeAaveSupplyRate(activeNodeChainId).then((response) => {
+        const apr = parseInt(response) / RAY;
+        const depositAPY =
+          Math.pow(1 + apr / SECONDS_PER_YEAR, SECONDS_PER_YEAR) - 1;
+        setSupplyRate(depositAPY);
       });
     }
   }, [activeNodeChainId]);
@@ -50,7 +81,7 @@ const Dashboard = () => {
     const getDepositTransactions = async () => {
       // Consulta todos los eventos de depósito del usuario
       const filter = {
-        address: dataContracts[activeNodeChainId].slave,
+        address: dataContracts[activeNodeChainId].node,
         topics: [
           ethers.utils.id("Deposit(address,uint256)"),
           ethers.utils.hexZeroPad(account, 32),
@@ -64,7 +95,7 @@ const Dashboard = () => {
   }, []);
 
   useEffect(() => {
-    if (account && activeNodeChainId) {
+    if (account && activeNodeChainId && vaultBalance) {
       getERC20BalanceFromProvider(
         dataContracts[activeNodeChainId].usdc,
         dataContracts[activeNodeChainId].provider.alchemy,
@@ -81,20 +112,21 @@ const Dashboard = () => {
         setAWRPUserBalance(response);
         if (response != 0) {
           getAvaliableToWithdrawFromProvider(
-            dataContracts[activeNodeChainId].slave,
-
+            dataContracts[activeNodeChainId].node,
             dataContracts[activeNodeChainId].provider.alchemy,
             response,
-          ).then((response) => setAvaliableToWithdraw(response));
+          ).then((response) => {
+            setAvaliableToWithdraw(response);
+          });
         }
       });
     }
-  }, [account, activeNodeChainId]);
+  }, [account, activeNodeChainId, vaultBalance]);
 
   useEffect(() => {
     setDepositModal(false);
     setWithdrawModal(false);
-  }, [chainId]);
+  }, [chainId, activeNodeChainId, vaultBalance]);
 
   return (
     <section id="contact" className="relative py-20 md:py-[120px]">
@@ -106,13 +138,37 @@ const Dashboard = () => {
             <div className="ud-contact-content-wrapper">
               <div className="ud-contact-title mb-12 lg:mb-[150px]">
                 <span className="mb-6 block text-base font-medium text-dark dark:text-white">
-                  DASHBOARD V1
+                  DASHBOARD V0.9
                 </span>
                 <h2 className="max-w-[260px] text-[30px] font-semibold leading-[1.14] text-dark dark:text-white">
                   Deposit And Withdraw Assets
                 </h2>
+                <div className=" mt-5">
+                  <p>Master Node Contract Deploy:</p>
+                  <div className="flex">
+                    <Image
+                      src={dataContracts[masterChainId].icon}
+                      alt="master_image"
+                      height={20}
+                      width={20}
+                      className="mr-2"
+                    />
+                    {dataContracts[masterChainId].master}
+
+                    <Link
+                      href={`${dataContracts[masterChainId].explorer}/address/${dataContracts[masterChainId].master}`}
+                      target="_blank"
+                      className="ml-1 text-sm"
+                    >
+                      <LiaExternalLinkAltSolid
+                        className="  cursor-pointer hover:text-blue"
+                        size={20}
+                      />
+                    </Link>
+                  </div>
+                </div>
               </div>
-              <div className="mb-12 flex flex-wrap justify-between lg:mb-0">
+              <div className="-mt-10 mb-12 flex flex-wrap justify-between lg:mb-0">
                 <div className="mb-8 flex w-full max-w-full ">
                   <div className="">
                     <table className="-ml-10 w-full  text-left  text-gray-500 dark:text-gray-400 rtl:text-right">
@@ -177,67 +233,73 @@ const Dashboard = () => {
                           </td>
                           <td className="px-6 py-4 text-center text-sm">
                             {parseFloat(avaliableToWithdraw / 10 ** 6).toFixed(
-                              2,
+                              6,
                             )}
                           </td>
                           <td className=" px-6 py-4">
                             <div className="flex justify-center">
-                              <Image
-                                src={"/images/arbitrum.svg"}
-                                alt="chainImg"
-                                height={25}
-                                width={25}
-                                className="mr-2"
-                              />
+                              {activeNodeChainId && (
+                                <Image
+                                  src={dataContracts[activeNodeChainId].icon}
+                                  alt="chainImg"
+                                  height={25}
+                                  width={25}
+                                  className="mr-2"
+                                />
+                              )}
                             </div>
                           </td>
                           <td className="px-6 py-4">
                             <div className="flex justify-center">
                               <Image
-                                src={"/images/ethereum.svg"}
+                                src={dataContracts[masterChainId].icon}
                                 alt="chainImg"
-                                height={15}
-                                width={15}
+                                height={25}
+                                width={25}
                                 className=""
                               />
                               <FaArrowRight className="mx-2 mt-1" />
-                              <Image
-                                src={"/images/arbitrum.svg"}
-                                alt="chainImg"
-                                height={25}
-                                width={25}
-                                className=""
-                              />
+                              {activeNodeChainId && (
+                                <Image
+                                  src={dataContracts[activeNodeChainId].icon}
+                                  alt="chainImg"
+                                  height={25}
+                                  width={25}
+                                  className=""
+                                />
+                              )}
                             </div>
                           </td>
-                          <td className="px-6 py-4">
-                            <div className="flex justify-center">
-                              <button
-                                onClick={() => {
-                                  account
-                                    ? chainId != activeNodeChainId
-                                      ? switchNetwork(activeNodeChainId)
-                                      : setDepositModal(true)
-                                    : connect();
-                                }}
-                                className="inline-flex items-center justify-center rounded-[4px] bg-primary px-3 py-2 text-sm  font-medium text-white transition duration-300 ease-in-out hover:bg-primary/90"
-                              >
-                                Deposit
-                              </button>
-                              <button
-                                onClick={() => {
-                                  account
-                                    ? chainId != masterChainId
-                                      ? switchNetwork(masterChainId)
-                                      : setWithdrawModal(true)
-                                    : connect();
-                                }}
-                                className="ml-2 inline-flex items-center justify-center rounded-[4px] bg-primary px-3 py-2 text-sm font-medium text-white transition duration-300 ease-in-out hover:bg-primary/90"
-                              >
-                                Withdraw
-                              </button>
-                            </div>
-                          </td>
+                          {activeNodeChainId && (
+                            <td className="px-6 py-4">
+                              <div className="flex justify-center">
+                                <button
+                                  onClick={() => {
+                                    account
+                                      ? chainId != activeNodeChainId
+                                        ? switchNetwork(activeNodeChainId)
+                                        : setDepositModal(true)
+                                      : connect();
+                                  }}
+                                  className="inline-flex items-center justify-center rounded-[4px] bg-primary px-3 py-2 text-sm  font-medium text-white transition duration-300 ease-in-out hover:bg-primary/90"
+                                >
+                                  Deposit
+                                </button>
+                                <button
+                                  onClick={() => {
+                                    account
+                                      ? chainId != masterChainId
+                                        ? switchNetwork(masterChainId)
+                                        : setWithdrawModal(true)
+                                      : connect();
+                                  }}
+                                  className="ml-2 inline-flex items-center justify-center rounded-[4px] bg-primary px-3 py-2 text-sm font-medium text-white transition duration-300 ease-in-out hover:bg-primary/90"
+                                >
+                                  Withdraw
+                                </button>
+                              </div>
+                            </td>
+                          )}
                         </tr>
                       </tbody>
                     </table>
@@ -250,7 +312,7 @@ const Dashboard = () => {
             <div
               className="wow fadeInUp rounded-lg bg-white px-8 py-10 shadow-testimonial dark:bg-dark-2 dark:shadow-none sm:px-10 sm:py-12 md:p-[60px] lg:p-10 lg:px-10 lg:py-12 2xl:p-[60px]"
               data-wow-delay=".2s
-              "
+            "
             >
               <h3 className="mb-8 text-2xl font-semibold text-dark dark:text-white md:text-[28px] md:leading-[1.42]">
                 Vault Allocation
@@ -260,33 +322,35 @@ const Dashboard = () => {
                   <div className="mb-4 block text-sm text-body-color dark:text-dark-6">
                     Address And Chain Allocation
                   </div>
-                  <div className="flex">
-                    <Image
-                      src={dataContracts[activeNodeChainId].icon}
-                      alt="chainImg"
-                      height={20}
-                      width={20}
-                      className="mr-2"
-                    />
-                    <div className="block pt-1 text-sm text-dark dark:text-white">
-                      {`${dataContracts[activeNodeChainId].slave.slice(0, 12)}...${dataContracts[
-                        activeNodeChainId
-                      ].slave.slice(-12)}`}
+                  {activeNodeChainId && (
+                    <div className="flex">
+                      <Image
+                        src={dataContracts[activeNodeChainId].icon}
+                        alt="chainImg"
+                        height={20}
+                        width={20}
+                        className="mr-2"
+                      />
+                      <div className="block pt-1 text-sm text-dark dark:text-white">
+                        {`${dataContracts[activeNodeChainId].node.slice(0, 12)}...${dataContracts[
+                          activeNodeChainId
+                        ].node.slice(-12)}`}
+                      </div>
+                      <Link
+                        href={`${dataContracts[activeNodeChainId].explorer}/address/${dataContracts[activeNodeChainId].node}`}
+                        target="_blank"
+                      >
+                        <LiaExternalLinkAltSolid className="ml-1 mt-1 cursor-pointer hover:text-blue" />
+                      </Link>
                     </div>
-                    <Link
-                      href={`${dataContracts[activeNodeChainId].explorer}address/${dataContracts[activeNodeChainId].slave}`}
-                      target="_blank"
-                    >
-                      <LiaExternalLinkAltSolid className="ml-1 mt-1 cursor-pointer hover:text-blue" />
-                    </Link>
-                  </div>
+                  )}
                 </div>
                 <div className="mb-[22px]">
                   <div className="mb-4 block text-sm text-body-color dark:text-dark-6">
                     Interest Rate
                   </div>
                   <div className="w-full border-0 border-b border-[#f1f1f1] bg-transparent pb-3 text-dark placeholder:text-body-color/60 focus:border-primary focus:outline-none dark:border-dark-3 dark:text-white">
-                    APY 8.02%
+                    APY {(supplyRate * 100).toFixed(2)}%
                   </div>
                 </div>
                 <div className="mb-[22px]">
@@ -318,7 +382,11 @@ const Dashboard = () => {
                 <div className="mb-[30px]">
                   <div className="mb-4 block text-sm text-body-color dark:text-dark-6">
                     Vault Status{" "}
-                    <span className="ml-2 font-bold text-green">Online</span>
+                    <span
+                      className={`ml-2 font-bold ${!isWarping ? "text-green" : "text-yellow-600 dark:text-yellow"} `}
+                    >
+                      {!isWarping ? "Online" : "Warping"}
+                    </span>
                     <ul className=" mt-2 list-inside list-disc">
                       <li>
                         Deposits:{" "}
@@ -326,7 +394,11 @@ const Dashboard = () => {
                       </li>
                       <li>
                         Withdraws:{" "}
-                        <span className="font-bold text-green">Online</span>
+                        <span
+                          className={`ml-2 font-bold ${!isWarping ? "text-green" : "text-yellow-600 dark:text-yellow"} `}
+                        >
+                          {!isWarping ? "Online" : "Warping"}
+                        </span>
                       </li>
                     </ul>
                   </div>
@@ -336,25 +408,30 @@ const Dashboard = () => {
           </div>
         </div>
       </div>
-      {depositModal && chainId == activeNodeChainId && (
-        <DepositModal
-          depositModal={depositModal}
-          setDepositModal={setDepositModal}
-          vaultBalance={vaultBalance}
-          account={account}
-          activeNodeChainId={activeNodeChainId}
-          masterChainId={masterChainId}
-        />
-      )}
-      {withdrawModal && dataContracts[userChainId]?.chainName == "sepolia" && (
-        <WithdrawModal
-          withdrawModal={withdrawModal}
-          setWithrawModal={setWithdrawModal}
-          userChainId={userChainId}
-          activeNodeChainId={activeNodeChainId}
-          account={account}
-          masterChainId={masterChainId}
-        />
+      {activeNodeChainId && (
+        <>
+          {" "}
+          {depositModal && chainId == activeNodeChainId && (
+            <DepositModal
+              depositModal={depositModal}
+              setDepositModal={setDepositModal}
+              vaultBalance={vaultBalance}
+              account={account}
+              activeNodeChainId={activeNodeChainId}
+              masterChainId={masterChainId}
+            />
+          )}
+          {withdrawModal && userChainId == masterChainId && (
+            <WithdrawModal
+              withdrawModal={withdrawModal}
+              setWithrawModal={setWithdrawModal}
+              userChainId={userChainId}
+              activeNodeChainId={activeNodeChainId}
+              account={account}
+              masterChainId={masterChainId}
+            />
+          )}
+        </>
       )}
     </section>
   );

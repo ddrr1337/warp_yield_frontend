@@ -1,8 +1,46 @@
+"use client";
+
 import Image from "next/image";
 import Link from "next/link";
 import { GiPlainArrow } from "react-icons/gi";
+import { useState, useEffect } from "react";
+import {
+  getERC20BalanceFromProvider,
+  getActiveNodeChainIdCCIP,
+} from "@/components/metamask/Metamask";
+import {
+  dataContracts,
+  masterChainId,
+  getChainIdByChainIdCCIP,
+} from "@/data/dataContracts";
+import { formatFloat } from "@/utils/utilFuncs";
 
 const Hero = () => {
+  const [activeNodeChainId, setActiveNodeChainId] = useState(null);
+  const [vaultBalance, setVaultBalance] = useState(0);
+
+  useEffect(() => {
+    getActiveNodeChainIdCCIP(
+      dataContracts[masterChainId].master,
+      dataContracts[masterChainId].provider.alchemy,
+    ).then((response) => {
+      const chainId = getChainIdByChainIdCCIP(parseInt(response));
+      setActiveNodeChainId(parseInt(chainId));
+    });
+  }, []);
+
+  useEffect(() => {
+    if (activeNodeChainId) {
+      getERC20BalanceFromProvider(
+        dataContracts[activeNodeChainId].ausdc,
+        dataContracts[activeNodeChainId].provider.alchemy,
+        dataContracts[activeNodeChainId].node,
+      ).then((response) => {
+        console.log(response);
+        setVaultBalance(response);
+      });
+    }
+  }, [activeNodeChainId]);
   return (
     <>
       <section
@@ -13,11 +51,14 @@ const Hero = () => {
           <div className="-mx-4 flex flex-wrap items-center">
             <div className="w-full px-4">
               <div
-                className="hero-content wow fadeInUp mx-auto max-w-[780px] text-center"
+                className="hero-content wow fadeInUp mx-auto max-w-[800px] text-center"
                 data-wow-delay=".2s"
               >
                 <h1 className="mb-6 text-3xl font-bold leading-snug text-white sm:text-4xl sm:leading-snug lg:text-5xl lg:leading-[1.2]">
-                  WARPYIELD a permissionless AAVE vault protocol
+                  <span className="bg-white pl-20 pr-2 text-blue-700">
+                    WARP
+                  </span>{" "}
+                  YIELD a permissionless AAVE vault protocol
                 </h1>
                 <p className="mx-auto mb-9 max-w-[600px] text-base font-medium text-white sm:text-lg sm:leading-[1.44]">
                   Warp Yield allow you to capture the highest yield on AAVE of
@@ -70,7 +111,9 @@ const Hero = () => {
                     className="wow fadeInUp flex items-center justify-center gap-4 text-center"
                     data-wow-delay=".3s"
                   >
-                    <div className="text-3xl text-white/60">600,000.00</div>
+                    <div className="text-3xl text-white/60">
+                      {formatFloat(parseFloat(vaultBalance / 10 ** 6))}
+                    </div>
 
                     <Image
                       src={"/images/hero/usdc.svg"}

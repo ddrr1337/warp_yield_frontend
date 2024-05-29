@@ -56,11 +56,7 @@ const WithdrawModal = ({
   };
 
   const getCurrentLinkFees = () => {
-    getLinkFeesWithdraw(
-      dataContracts[activeNodeChainId].chainIdCCIP,
-      dataContracts[activeNodeChainId].slave,
-      account,
-    ).then((response) => {
+    getLinkFeesWithdraw(account, activeNodeChainId).then((response) => {
       setLinkFeeRequired(response);
     });
   };
@@ -72,7 +68,7 @@ const WithdrawModal = ({
       const tx = await approveERC20(
         dataContracts[masterChainId].link,
         dataContracts[masterChainId].master,
-        linkFeeRequired * 1.2,
+        linkFeeRequired * 2,
         1,
       );
       if (tx && tx.wait) {
@@ -102,12 +98,12 @@ const WithdrawModal = ({
       getERC20BalanceFromProvider(
         dataContracts[activeNodeChainId].ausdc,
         dataContracts[activeNodeChainId].provider.alchemy,
-        dataContracts[activeNodeChainId].slave,
+        dataContracts[activeNodeChainId].node,
       ).then((response) => {
         setVaultBalance(response);
       });
       getTotalSupplyAWRPFromProvider(
-        dataContracts[activeNodeChainId].slave,
+        dataContracts[activeNodeChainId].node,
         dataContracts[activeNodeChainId].provider.alchemy,
       ).then((response) => {
         setAWRPTotalSupply(response);
@@ -125,11 +121,7 @@ const WithdrawModal = ({
     try {
       setIsSendingTx(true);
       setTxHash(null);
-      const tx = await withdrawUsdc(
-        dataContracts[activeNodeChainId].chainIdCCIP,
-        dataContracts[activeNodeChainId].slave,
-        burnAWRP,
-      );
+      const tx = await withdrawUsdc(burnAWRP);
       if (tx && tx.wait) {
         setTxHash(tx);
         await tx.wait();
@@ -154,8 +146,6 @@ const WithdrawModal = ({
     }
   };
 
-  console.log(dataContracts[activeNodeChainId].slave);
-
   return (
     withdrawModal && (
       <div
@@ -170,11 +160,11 @@ const WithdrawModal = ({
               <div>
                 <div className="flex items-center">
                   <h3 className="flex text-lg font-semibold text-gray-900 dark:text-white">
-                    Withdraw USDC On{" "}
-                    {dataContracts[activeNodeChainId].formatedName}
+                    Withdraw USDC from{" "}
+                    {dataContracts[masterChainId].formatedName}
                     <span>
                       <Image
-                        src={dataContracts[activeNodeChainId].icon}
+                        src={dataContracts[masterChainId].icon}
                         alt="usdcIcon"
                         height={25}
                         width={25}
@@ -271,7 +261,7 @@ const WithdrawModal = ({
                 <div className="col-span-2 sm:col-span-1"></div>
                 <div className="col-span-2 sm:col-span-1">
                   <label className="mb-2 ml-1 block text-xs font-medium text-gray-900 dark:text-white">
-                    Current Fee For Deposit
+                    Current Fee For Withdraw
                   </label>
                   <div
                     className={` focus:ring-primary-600 focus:border-primary-600 dark:focus:ring-primary-500 dark:focus:border-primary-500 block flex w-full justify-between rounded-lg border   ${linkFeeRequired > linkAllowance ? "border-red" : "border-gray-300"} bg-gray-50 p-2.5 text-sm text-gray-900 dark:border-gray-500 dark:bg-gray-600 dark:text-white dark:placeholder-gray-400`}
@@ -347,13 +337,14 @@ const WithdrawModal = ({
                     id="description"
                     className="block h-[150px] w-full overflow-auto rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-sm text-gray-900 focus:border-blue-500 focus:ring-blue-500 dark:border-gray-500 dark:bg-gray-600 dark:text-white dark:placeholder-gray-400 dark:focus:border-blue-500 dark:focus:ring-blue-500"
                   >
-                    Why do I need to connect to Sepolia to make a withdrawal?{" "}
-                    <br />
+                    Why do I need to connect to{" "}
+                    {dataContracts[masterChainId].formatedName} to make a
+                    withdrawal? <br />
                     User balances are stored in the MASTER CONTRACT located in
-                    Sepolia. Once you give the withdrawal order, it will
-                    propagate to where the vault is located at that moment, the
-                    withdrawal will be made, and your funds will remain on that
-                    blockchain.
+                    {dataContracts[masterChainId].formatedName}. Once you give
+                    the withdrawal order, it will propagate to where the vault
+                    is located at that moment, the withdrawal will be made, and
+                    your funds will remain on that blockchain.
                     <br /> The propagation of the withdrawal order usually takes
                     about 20 minutes to complete.
                   </div>

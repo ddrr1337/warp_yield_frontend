@@ -18,8 +18,8 @@ const Footer = () => {
               </div>
 
               <p className="mb-8 max-w-[270px] text-base text-gray-7">
-                I create new financial experiences for everyone by using
-                blockchain technology.
+                New financial experiences for everyone by using blockchain
+                technology.
               </p>
               <div className="flex items-center">
                 <Link href={"https://x.com/iNcAeLuM007"} target="_blank">
@@ -105,7 +105,7 @@ const Footer = () => {
               <ul>
                 <li>
                   <a
-                    href="/#"
+                    href="/docs/nodeContractRoles/deposits"
                     className="mb-3 inline-block text-base text-gray-7 hover:text-primary"
                   >
                     Deposit
@@ -113,7 +113,7 @@ const Footer = () => {
                 </li>
                 <li>
                   <a
-                    href="/#"
+                    href="/nodeContractRoles/deposits"
                     className="mb-3 inline-block text-base text-gray-7 hover:text-primary"
                   >
                     Withdraw
@@ -121,51 +121,10 @@ const Footer = () => {
                 </li>
                 <li>
                   <a
-                    href="/#"
+                    href="/masterContractRoles/warp-assets"
                     className="mb-3 inline-block text-base text-gray-7 hover:text-primary"
                   >
                     Warp Vault
-                  </a>
-                </li>
-              </ul>
-            </div>
-          </div>
-          <div className="w-full px-4 md:w-2/3 lg:w-6/12 xl:w-3/12">
-            <div className="mb-10 w-full">
-              <h4 className="mb-9 text-lg font-semibold text-white">
-                Useful Links
-              </h4>
-              <ul>
-                <li>
-                  <a
-                    href="/#"
-                    className="mb-3 inline-block text-base text-gray-7 hover:text-primary"
-                  >
-                    FAQ
-                  </a>
-                </li>
-                <li>
-                  <a
-                    href="/#"
-                    className="mb-3 inline-block text-base text-gray-7 hover:text-primary"
-                  >
-                    Blogs
-                  </a>
-                </li>
-                <li>
-                  <a
-                    href="/#"
-                    className="mb-3 inline-block text-base text-gray-7 hover:text-primary"
-                  >
-                    Support
-                  </a>
-                </li>
-                <li>
-                  <a
-                    href="/#"
-                    className="mb-3 inline-block text-base text-gray-7 hover:text-primary"
-                  >
-                    About
                   </a>
                 </li>
               </ul>

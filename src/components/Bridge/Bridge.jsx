@@ -224,7 +224,7 @@ const Bridge = () => {
             <div className="ud-contact-content-wrapper">
               <div className="ud-contact-title -mb-[100px] mt-20">
                 <span className="mb-6 block text-base font-medium text-dark dark:text-white">
-                  BRIDGE V1
+                  BRIDGE V0.9
                 </span>
                 <h2 className="  max-w-[300px]  text-[30px] font-semibold leading-[1.14] text-dark dark:text-white">
                   Bridge USDC To Multiple Chains

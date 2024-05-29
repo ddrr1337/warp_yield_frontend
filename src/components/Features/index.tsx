@@ -9,7 +9,7 @@ const Features = () => {
         <SectionTitle
           subtitle="Features"
           title="Main Features Of Warp Yield"
-          paragraph="Con Warp Yeild no necesitaras preocuparte por mover tu capital entre blockcahins para obtener el yild mas alto de AAVE, alguien lo hara por ti!!"
+          paragraph="With Warp Yield, you won't need to worry about moving your capital between blockchains to get the highest AAVE yield; someone will do it for you!"
         />
 
         <div className="-mx-4 mt-12 flex flex-wrap lg:mt-20">

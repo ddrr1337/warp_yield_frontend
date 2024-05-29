@@ -8,7 +8,7 @@ const Faq = () => {
         <SectionTitle
           subtitle="FAQ"
           title="Any Questions? Answered"
-          paragraph="There are many variations of passages of Lorem Ipsum available but the majority have suffered alteration in some form."
+          paragraph="Here is the most Common questions about the protocol."
           width="640px"
           center
         />
@@ -16,31 +16,32 @@ const Faq = () => {
         <div className="-mx-4 mt-[60px] flex flex-wrap lg:mt-20">
           <div className="w-full px-4 lg:w-1/2">
             <SingleFaq
-              question="How to use TailGrids?"
-              answer="It takes 2-3 weeks to get your first blog post ready. That includes the in-depth research & creation of your monthly content marketing strategy that we do before writing your first blog post, Ipsum available ."
+              question="Where I need to deposit?"
+              answer="Deposits will always be made on the blockchain where the active node is currently located."
             />
             <SingleFaq
-              question="How to download icons from LineIcons?"
-              answer="It takes 2-3 weeks to get your first blog post ready. That includes the in-depth research & creation of your monthly content marketing strategy that we do before writing your first blog post, Ipsum available ."
+              question="Where are my aWRP tokens?"
+              answer="The aWRP tokens minted as a result of a deposit will always be minted on the blockchain where the master contract is located."
             />
+
             <SingleFaq
-              question="Is GrayGrids part of UIdeck?"
-              answer="It takes 2-3 weeks to get your first blog post ready. That includes the in-depth research & creation of your monthly content marketing strategy that we do before writing your first blog post, Ipsum available ."
+              question="Where I need to withdraw?"
+              answer="Withdrawals will always be made from the blockchain where the master contract is located."
             />
           </div>
 
           <div className="w-full px-4 lg:w-1/2">
             <SingleFaq
-              question="Can I use this template for commercial project?"
-              answer="It takes 2-3 weeks to get your first blog post ready. That includes the in-depth research & creation of your monthly content marketing strategy that we do before writing your first blog post, Ipsum available ."
+              question="Where are my USDC tokenes withdrawn"
+              answer="The resulting USDC from a withdrawal is located on the blockchain where the active node is."
             />
             <SingleFaq
-              question="Do you have plan to releasing Play Pro?"
-              answer="It takes 2-3 weeks to get your first blog post ready. That includes the in-depth research & creation of your monthly content marketing strategy that we do before writing your first blog post, Ipsum available ."
+              question="Why I need to pay LINK fees"
+              answer="Warp Yield uses the CCIP protocol for token and message exchanges between blockchains. These services are paid for with the LINK token"
             />
             <SingleFaq
-              question="Where and how to host this template?"
-              answer="It takes 2-3 weeks to get your first blog post ready. That includes the in-depth research & creation of your monthly content marketing strategy that we do before writing your first blog post, Ipsum available ."
+              question="Can anyone warp assets in vault?"
+              answer="Yes, anyone can do it, as long as the required conditions for the warp are met."
             />
           </div>
         </div>

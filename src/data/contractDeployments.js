@@ -1,12 +1,12 @@
-import Master from "./abiContracts/Master.json";
-import Slave from "./abiContracts/Slave.json";
+import MasterNode from "./abiContracts/MasterNode.json";
+import Node from "./abiContracts/Node.json";
 import ERC20 from "./abiContracts/ERC20.json";
 import DataPool from "./abiContracts/IPoolDataProvider.json";
 import Bridge from "./abiContracts/Bridge.json";
 import CircleBridge from "./abiContracts/IMessageTransmitter.json";
 
-export const masterAbi = Master.abi;
-export const slaveAbi = Slave.abi;
+export const masterAbi = MasterNode.abi;
+export const nodeAbi = Node.abi;
 export const ERC20Abi = ERC20.abi;
 export const dataPoolAbi = DataPool.abi;
 

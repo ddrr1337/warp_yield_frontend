@@ -56,7 +56,7 @@ const DepositModal = ({
       setIsSendingTx(true);
       const tx = await approveERC20(
         dataContracts[activeNodeChainId].usdc,
-        dataContracts[activeNodeChainId].slave,
+        dataContracts[activeNodeChainId].node,
         depositUsdc,
         10 ** 6,
       );
@@ -66,7 +66,7 @@ const DepositModal = ({
         const response = await getERC20Allowance(
           dataContracts[activeNodeChainId].usdc,
           account,
-          dataContracts[activeNodeChainId].slave,
+          dataContracts[activeNodeChainId].node,
         );
         setUsdcAllowance(response);
       }
@@ -84,8 +84,8 @@ const DepositModal = ({
       setIsSendingLinkAproval(true);
       const tx = await approveERC20(
         dataContracts[activeNodeChainId].link,
-        dataContracts[activeNodeChainId].slave,
-        linkFeeRequired * 1.2,
+        dataContracts[activeNodeChainId].node,
+        linkFeeRequired * 2,
         1,
       );
       if (tx && tx.wait) {
@@ -94,7 +94,7 @@ const DepositModal = ({
         const response = await getERC20Allowance(
           dataContracts[activeNodeChainId].link,
           account,
-          dataContracts[activeNodeChainId].slave,
+          dataContracts[activeNodeChainId].node,
         );
         setLinkAllowance(response);
       }
@@ -111,7 +111,7 @@ const DepositModal = ({
       setTxHash(null);
       setIsSendingTx(true);
       const tx = await depositUSDC(
-        dataContracts[activeNodeChainId].slave,
+        dataContracts[activeNodeChainId].node,
         depositUsdc,
       );
       if (tx && tx.wait) {
@@ -120,7 +120,7 @@ const DepositModal = ({
         const responseAllowance = await getERC20Allowance(
           dataContracts[activeNodeChainId].usdc,
           account,
-          dataContracts[activeNodeChainId].slave,
+          dataContracts[activeNodeChainId].node,
         );
         setUsdcAllowance(responseAllowance);
         const responseBalanceUsdc = await getERC20Balance(
@@ -131,7 +131,7 @@ const DepositModal = ({
         const responseLinkAllowance = await getERC20Allowance(
           dataContracts[activeNodeChainId].link,
           account,
-          dataContracts[activeNodeChainId].slave,
+          dataContracts[activeNodeChainId].node,
         );
         setLinkAllowance(responseLinkAllowance);
       }
@@ -148,11 +148,9 @@ const DepositModal = ({
   };
 
   const getCurrentLinkFees = () => {
-    getLinkFeesDeposit(dataContracts[activeNodeChainId].slave, account).then(
-      (response) => {
-        setLinkFeeRequired(response);
-      },
-    );
+    getLinkFeesDeposit(account, activeNodeChainId).then((response) => {
+      setLinkFeeRequired(response);
+    });
   };
 
   useEffect(() => {
@@ -160,7 +158,7 @@ const DepositModal = ({
       getERC20Balance(dataContracts[activeNodeChainId].usdc, account).then(
         (response) => setUsdcUserBalance(response),
       );
-      getTotalSupplyAWRPSlaveView(dataContracts[activeNodeChainId].slave).then(
+      getTotalSupplyAWRPSlaveView(dataContracts[activeNodeChainId].node).then(
         (response) => {
           setAWRPTotalSupply(response);
         },
@@ -175,14 +173,14 @@ const DepositModal = ({
       getERC20Allowance(
         dataContracts[activeNodeChainId].usdc,
         account,
-        dataContracts[activeNodeChainId].slave,
+        dataContracts[activeNodeChainId].node,
       ).then((response) => setUsdcAllowance(response));
       getCurrentLinkFees();
 
       getERC20Allowance(
         dataContracts[activeNodeChainId].link,
         account,
-        dataContracts[activeNodeChainId].slave,
+        dataContracts[activeNodeChainId].node,
       ).then((response) => setLinkAllowance(response));
     }
   }, [account]);
@@ -417,8 +415,9 @@ const DepositModal = ({
                     Once you make the deposit, your USDC will automatically
                     start generating yield. However, you will not be able to see
                     your aWRP balance updated until your new deposit is
-                    propagated to the MASTER contract on the Sepolia network.
-                    This usually take about 20 minutes.
+                    propagated to the MASTER contract on the{" "}
+                    {dataContracts[masterChainId].formatedName} network. This
+                    usually take about 20 minutes.
                   </div>
                 </div>
               </div>
