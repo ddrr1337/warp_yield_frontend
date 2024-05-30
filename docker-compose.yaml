@@ -1,9 +1,9 @@
 version: "3.1"
 
 services:
-  parquecar_frontend:
+  warp_yield_frontend:
     build:
-      context: ./warpyield_frontend
+      context: ./warp_yield_frontend
       dockerfile: Dockerfile
     image: warpyield_frontend:v1
 

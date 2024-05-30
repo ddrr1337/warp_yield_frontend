@@ -19,7 +19,7 @@ import Loading from "../Common/Loading";
 import addObectToStorage from "../Common/addObjectToStorage";
 import Web3 from "web3";
 import { IoInformationCircleOutline } from "react-icons/io5";
-import TableAddresses from "./tableAddresses";
+
 import { saveTxHashByType } from "@/utils/utilFuncs";
 
 // Opciones con imagen y texto
@@ -255,9 +255,7 @@ const Bridge = () => {
                 </div>
               </div>
 
-              <div className="mb-10 mt-40 xl:mb-0">
-                <TableAddresses />
-              </div>
+              <div className="mb-10 mt-40 xl:mb-0"></div>
             </div>
           </div>
           <div className="flex w-full items-center justify-center px-4 lg:w-5/12 xl:w-8/12">
