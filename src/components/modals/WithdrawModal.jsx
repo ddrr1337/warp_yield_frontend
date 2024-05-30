@@ -15,6 +15,7 @@ import { dataContracts, cahinLinkCCIPExplorer } from "@/data/dataContracts";
 import Loading from "../Common/Loading";
 import { LuRefreshCw } from "react-icons/lu";
 import { IoInformationCircleOutline } from "react-icons/io5";
+import { saveTxHashByType } from "@/utils/utilFuncs";
 
 const WithdrawModal = ({
   withdrawModal,
@@ -31,6 +32,7 @@ const WithdrawModal = ({
   const [AWRPTotalSupply, setAWRPTotalSupply] = useState(0);
   const [burnAWRP, setBurnAWRP] = useState(0);
   const [txHash, setTxHash] = useState(null);
+  const [txHashApprove, setTxHashApprove] = useState(null);
   const [isSendingTx, setIsSendingTx] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
   const [isSendingLinkApproval, setIsSendingLinkAproval] = useState(false);
@@ -63,6 +65,7 @@ const WithdrawModal = ({
   const handleApproveLink = async () => {
     try {
       setIsDepositTx(false);
+      setTxHashApprove(null);
       setTxHash(null);
       setIsSendingLinkAproval(true);
       const tx = await approveERC20(
@@ -72,7 +75,7 @@ const WithdrawModal = ({
         1,
       );
       if (tx && tx.wait) {
-        setTxHash(tx);
+        setTxHashApprove(tx);
         await tx.wait();
         const response = await getERC20Allowance(
           dataContracts[masterChainId].link,
@@ -121,9 +124,17 @@ const WithdrawModal = ({
     try {
       setIsSendingTx(true);
       setTxHash(null);
+      setTxHashApprove(null);
       const tx = await withdrawUsdc(burnAWRP);
       if (tx && tx.wait) {
         setTxHash(tx);
+        saveTxHashByType(
+          tx.hash,
+          "withdraw",
+          masterChainId,
+          activeNodeChainId,
+          account,
+        );
         await tx.wait();
 
         const responseBalanceAwrp = await getERC20Balance(
@@ -361,6 +372,36 @@ const WithdrawModal = ({
                 {isSendingTx ? <Loading /> : "Withdraw"}
               </button>
               <div>
+                {txHashApprove && (
+                  <>
+                    <div className="mt-4 flex items-center">
+                      <div className="flex-grow border-b border-gray-300"></div>
+                    </div>
+                    <div className="mt-2 flex justify-center text-sm">
+                      <Image
+                        src={dataContracts[masterChainId].icon}
+                        alt="usdcIcon"
+                        height={20}
+                        width={20}
+                        className="-mt-1 mr-1 "
+                      />
+
+                      {dataContracts[masterChainId].formatedName}
+                    </div>
+
+                    <div className="mt-1 flex justify-center text-sm">
+                      <Link
+                        href={`${dataContracts[masterChainId].explorer}${txHashApprove.hash}`}
+                        target="_blank"
+                      >
+                        <span className="hover:text-violet-500">{`${txHashApprove.hash.slice(
+                          0,
+                          15,
+                        )}...${txHashApprove.hash.slice(-15)}`}</span>
+                      </Link>
+                    </div>
+                  </>
+                )}
                 {txHash && (
                   <>
                     <div className="mt-4 flex items-center">

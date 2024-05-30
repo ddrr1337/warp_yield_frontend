@@ -219,8 +219,6 @@ const getLinkFeesDeposit = async (account, activeNodeChainId) => {
     [command, account, dummyShares],
   );
 
-  console.log(dataBytes);
-
   const getLinkGas = await nodeContract.getLinkFees(
     masterCCIPId,
     masterContractAddress,

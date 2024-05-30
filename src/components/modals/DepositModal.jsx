@@ -15,6 +15,7 @@ import { dataContracts, cahinLinkCCIPExplorer } from "@/data/dataContracts";
 import Loading from "@/components/Common/Loading";
 import { IoInformationCircleOutline } from "react-icons/io5";
 import { LuRefreshCw } from "react-icons/lu";
+import { saveTxHashByType } from "@/utils/utilFuncs";
 
 const DepositModal = ({
   depositModal,
@@ -116,6 +117,13 @@ const DepositModal = ({
       );
       if (tx && tx.wait) {
         setTxHash(tx);
+        saveTxHashByType(
+          tx.hash,
+          "deposit",
+          activeNodeChainId,
+          masterChainId,
+          account,
+        );
         await tx.wait();
         const responseAllowance = await getERC20Allowance(
           dataContracts[activeNodeChainId].usdc,

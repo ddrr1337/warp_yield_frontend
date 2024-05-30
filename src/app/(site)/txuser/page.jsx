@@ -2,17 +2,17 @@ import About from "@/components/About";
 import Breadcrumb from "@/components/Common/Breadcrumb";
 import Team from "@/components/Team";
 import { Metadata } from "next";
+import TableTx from "./tableTx";
+import TransactionTable from "./TransactionTable";
 
-export const metadata: Metadata = {
-  title: "About Us | Play SaaS Starter Kit and Boilerplate for Next.js",
-  description: "This is About page description",
-};
-
-const AboutPage = () => {
+const Transactions = () => {
   return (
     <main>
-      <Breadcrumb pageName="About Us Page" />
-      <About />
+      <Breadcrumb pageName="My Transactions" />
+      <div className="container mt-10">
+        <TransactionTable />
+      </div>
+
       <div className="area h-[400px]">
         <ul className="circles">
           <li></li>
@@ -27,9 +27,8 @@ const AboutPage = () => {
           <li></li>
         </ul>
       </div>
-      <Team />
     </main>
   );
 };
 
-export default AboutPage;
+export default Transactions;

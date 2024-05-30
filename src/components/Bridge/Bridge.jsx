@@ -20,6 +20,7 @@ import addObectToStorage from "../Common/addObjectToStorage";
 import Web3 from "web3";
 import { IoInformationCircleOutline } from "react-icons/io5";
 import TableAddresses from "./tableAddresses";
+import { saveTxHashByType } from "@/utils/utilFuncs";
 
 // Opciones con imagen y texto
 
@@ -93,6 +94,13 @@ const Bridge = () => {
       if (tx && tx.wait) {
         await tx.wait();
         setTxHash(tx.hash);
+        saveTxHashByType(
+          tx.hash,
+          "bridge",
+          originChain.chainId,
+          destinationChain.chainId,
+          account,
+        );
         const responseAllowance = await getERC20Allowance(
           dataContracts[originChain.chainId].usdc,
           account,
@@ -474,7 +482,6 @@ const Bridge = () => {
             </div>
           </div>
         </div>
-        <div className="text-center">Tx History</div>
       </div>
     </section>
   );

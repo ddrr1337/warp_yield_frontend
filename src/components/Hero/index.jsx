@@ -69,7 +69,7 @@ const Hero = () => {
                   <li>
                     <Link
                       href="/dashboard"
-                      className="inline-flex items-center justify-center rounded-md bg-white px-7 py-[14px] text-center text-base font-medium text-black shadow-1 transition duration-300 ease-in-out hover:bg-gray-2"
+                      className="inline-flex items-center justify-center rounded-md bg-white px-7 py-[14px] text-center text-base font-medium text-black shadow-1 transition duration-300 ease-in-out hover:bg-gray-7"
                     >
                       <GiPlainArrow className="mr-2 -rotate-90" size={25} />
                       Start App
@@ -79,7 +79,7 @@ const Hero = () => {
                     <Link
                       href="https://github.com/ddrr1337/warp_aave"
                       target="_blank"
-                      className="flex items-center gap-4 rounded-md bg-white px-6 py-[14px] text-base font-medium text-black transition duration-300 ease-in-out hover:bg-gray-2"
+                      className="flex items-center gap-4 rounded-md bg-white px-6 py-[14px] text-base font-medium text-black transition duration-300 ease-in-out hover:bg-gray-7"
                     >
                       <svg
                         className="fill-current"

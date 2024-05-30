@@ -24,7 +24,6 @@ import { use, useEffect, useState } from "react";
 import DepositModal from "@/components/modals/DepositModal";
 import WithdrawModal from "@/components/modals/WithdrawModal";
 import { useMetaMask } from "metamask-react";
-import { connected } from "process";
 
 const Dashboard = () => {
   const [activeNodeChainId, setActiveNodeChainId] = useState(null);

@@ -1,3 +1,5 @@
+import { dataContracts, masterChainId } from "@/data/dataContracts";
+
 export function formatFloat(num) {
   // Convertir el número a una cadena y dividirlo en partes entera y decimal
   let parts = num.toFixed(2).toString().split(".");
@@ -23,3 +25,39 @@ export function formatFloat(num) {
 
   return formattedNum;
 }
+
+export const saveTxHashByType = (
+  txHash,
+  type,
+  fromChainId,
+  toChainId,
+  account,
+) => {
+  const existingTxs = JSON.parse(localStorage.getItem(type)) || [];
+  const txDetails = {
+    txHash: txHash,
+    timestamp: new Date().toISOString(),
+    fromChain: fromChainId,
+    toChain: toChainId,
+    type: type,
+    caller: account,
+  };
+  existingTxs.push(txDetails);
+  localStorage.setItem(type, JSON.stringify(existingTxs));
+};
+
+export const getTxHashesByType = (type) => {
+  return JSON.parse(localStorage.getItem(type)) || [];
+};
+
+export const getAllTxHashesSortedByDate = () => {
+  const depositTxs = getTxHashesByType("deposit");
+  const withdrawTxs = getTxHashesByType("withdraw");
+  const bridgeTxs = getTxHashesByType("bridge");
+
+  const allTxs = [...depositTxs, ...withdrawTxs, ...bridgeTxs];
+
+  allTxs.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+
+  return allTxs;
+};
