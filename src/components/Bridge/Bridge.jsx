@@ -230,7 +230,7 @@ const Bridge = () => {
         <div className="-mx-4 flex flex-col items-center lg:flex-row">
           <div className="w-full px-4 lg:w-7/12 xl:w-8/12">
             <div className="ud-contact-content-wrapper">
-              <div className="ud-contact-title -mb-[100px] mt-20">
+              <div className="ud-contact-title -mt-40">
                 <span className="mb-6 block text-base font-medium text-dark dark:text-white">
                   BRIDGE V0.9
                 </span>
