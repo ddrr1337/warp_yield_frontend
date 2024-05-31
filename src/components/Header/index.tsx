@@ -226,7 +226,7 @@ const Header = () => {
                     className={`mr-2 ${!sticky && pathUrl === "/" ? "hover:text-black" : "hover:text-blue"} ${!sticky && pathUrl === "/" && "text-white"} `}
                   />
                 </Link>
-                <Link href={"https://twitter.com/iNcAeLuM007"} target="_blank">
+                <Link href={"https://x.com/WarpYield2024"} target="_blank">
                   <FaXTwitter
                     size={22}
                     className={`mr-1 ${!sticky && pathUrl === "/" ? "hover:text-black" : "hover:text-blue"} ${!sticky && pathUrl === "/" && "text-white"} `}

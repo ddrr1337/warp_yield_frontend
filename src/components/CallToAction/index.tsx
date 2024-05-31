@@ -17,7 +17,7 @@ const CallToAction = () => {
                 </h2>
                 <p className="mx-auto mb-6 max-w-[515px] text-base leading-[1.5] text-white">
                   To allow Warp Yield users to borrow loans by collateralizing
-                  their earned aWRP from participating in the protocol
+                  their aWRP tokens from participating in the protocol
                 </p>
               </div>
             </div>

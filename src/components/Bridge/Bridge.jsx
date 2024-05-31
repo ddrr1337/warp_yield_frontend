@@ -1,7 +1,6 @@
 "use client";
 
 import Image from "next/image";
-import { MdOutlineDoubleArrow } from "react-icons/md";
 import CustomDropdown from "./CustomDropdown";
 import { useEffect, useState } from "react";
 import { dataContracts } from "@/data/dataContracts";
@@ -16,7 +15,6 @@ import {
   switchNetwork,
 } from "../metamask/Metamask";
 import Loading from "../Common/Loading";
-import addObectToStorage from "../Common/addObjectToStorage";
 import Web3 from "web3";
 import { IoInformationCircleOutline } from "react-icons/io5";
 
@@ -252,6 +250,24 @@ const Bridge = () => {
                     Fee is <span className=" font-bold">FIXED</span>, no matter
                     the amount you bridge.
                   </h5>
+                  <div className="mt-3 flex">
+                    <Image
+                      src={dataContracts[43113].icon}
+                      alt="avax"
+                      width={20}
+                      height={20}
+                      className="mr-2"
+                    />
+                    <span className="mt-0.5">And</span>
+                    <Image
+                      src={dataContracts[80002].icon}
+                      alt="avax"
+                      width={20}
+                      height={20}
+                      className="mx-2"
+                    />
+                    <span className="mt-0.5">Comming Soon!!</span>
+                  </div>
                 </div>
               </div>
 

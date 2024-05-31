@@ -1,0 +1,17 @@
+
+
+
+# Commands handled by master contract
+
+
+When the master contract receives a message, this message will include a "header" (first uint8 decoded from message) with the command that the master contract needs to execute. This way, the contract can distinguish the type of message it receives and what it should do with it.
+
+
+| COMMAND | ACTION |
+|---------|--------|
+| 0 | Incoming deposit (mint aWRP) |
+| 1 | Resume protocol operations (withdraws online) |
+| 2 | Receive data from AAVE node |
+
+
+

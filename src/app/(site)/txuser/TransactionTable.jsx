@@ -4,6 +4,7 @@ import { getAllTxHashesSortedByDate } from "@/utils/utilFuncs";
 import { dataContracts, cahinLinkCCIPExplorer } from "@/data/dataContracts";
 import Image from "next/image";
 import Link from "next/link";
+import { humanReadableTime } from "@/utils/utilFuncs";
 
 const TransactionTable = () => {
   const transactions = getAllTxHashesSortedByDate();
@@ -53,7 +54,7 @@ const TransactionTable = () => {
               </th>
 
               <td className="flex justify-center px-6 py-4">
-                <div className="flex justify-center">
+                <div className="items center flex justify-center">
                   <Image
                     src={dataContracts[item.fromChain].icon}
                     height={item.fromChain == 11155111 ? 16 : 22}
@@ -64,7 +65,7 @@ const TransactionTable = () => {
               </td>
               <td className="px-6 py-4">
                 {" "}
-                <div className="flex justify-center">
+                <div className="flex items-center justify-center">
                   <Image
                     src={dataContracts[item.toChain].icon}
                     height={item.toChain == 11155111 ? 16 : 22}
@@ -85,8 +86,8 @@ const TransactionTable = () => {
                 >
                   <span className="hover:text-blue-500">{`${item.txHash.slice(
                     0,
-                    15,
-                  )}...${item.txHash.slice(-15)}`}</span>
+                    10,
+                  )}...${item.txHash.slice(-10)}`}</span>
                 </Link>
               </td>
               <td className="px-6 py-4">
@@ -96,7 +97,7 @@ const TransactionTable = () => {
                   15,
                 )}...${item.caller.slice(-7)}`}</span>
               </td>
-              <td className="px-6 py-4">{item.timestamp}</td>
+              <td className="px-6 py-4">{humanReadableTime(item.timestamp)}</td>
             </tr>
           ))}
         </tbody>

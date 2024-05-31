@@ -183,26 +183,10 @@ const Dashboard = () => {
                             Avl To Withdraw
                           </th>
                           <th scope="col" className=" px-6 py-3 text-center">
-                            <div className="flex">
-                              Deposit{" "}
-                              <span>
-                                <IoInformationCircleOutline
-                                  className="ml-1 mt-1"
-                                  size={13}
-                                />
-                              </span>
-                            </div>
+                            <div className="flex">Deposit </div>
                           </th>
                           <th scope="col" className=" px-6 py-3 text-center">
-                            <div className="flex">
-                              Withdraw{" "}
-                              <span>
-                                <IoInformationCircleOutline
-                                  className="ml-1 mt-1"
-                                  size={13}
-                                />
-                              </span>
-                            </div>
+                            <div className="flex">Withdraw </div>
                           </th>
                           <th scope="col" className="px-6 py-3 text-center">
                             Action
@@ -285,6 +269,7 @@ const Dashboard = () => {
                                   Deposit
                                 </button>
                                 <button
+                                  disabled={isWarping}
                                   onClick={() => {
                                     account
                                       ? chainId != masterChainId
@@ -292,7 +277,7 @@ const Dashboard = () => {
                                         : setWithdrawModal(true)
                                       : connect();
                                   }}
-                                  className="ml-2 inline-flex items-center justify-center rounded-[4px] bg-primary px-3 py-2 text-sm font-medium text-white transition duration-300 ease-in-out hover:bg-primary/90"
+                                  className={`${isWarping && " opacity-50"} ml-2 inline-flex items-center justify-center rounded-[4px] bg-primary px-3 py-2 text-sm font-medium text-white transition duration-300 ease-in-out hover:bg-primary/90`}
                                 >
                                   Withdraw
                                 </button>
@@ -394,9 +379,9 @@ const Dashboard = () => {
                       <li>
                         Withdraws:{" "}
                         <span
-                          className={`ml-2 font-bold ${!isWarping ? "text-green" : "text-yellow-600 dark:text-yellow"} `}
+                          className={`ml-2 font-bold ${!isWarping ? "text-green" : "text-red-600 dark:text-red"} `}
                         >
-                          {!isWarping ? "Online" : "Warping"}
+                          {!isWarping ? "Online" : "Halted while warping"}
                         </span>
                       </li>
                     </ul>
