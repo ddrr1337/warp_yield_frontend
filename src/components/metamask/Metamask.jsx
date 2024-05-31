@@ -285,7 +285,19 @@ const getIsWarpingNodeFromProvider = async () => {
   return activeNodeAddress.toLowerCase() === ZERO_ADDRESS.toLowerCase();
 };
 
+const getLastTimeWarped = async () => {
+  const contract = providerInstanceContract(
+    dataContracts[masterChainId].master,
+    masterAbi,
+    dataContracts[masterChainId].provider.alchemy,
+  );
+  const lastTimeWarped = await contract.lastTimeWarped();
+
+  return lastTimeWarped;
+};
+
 export {
+  getLastTimeWarped,
   getIsWarpingNodeFromProvider,
   getNodeAaveSupplyRate,
   getActiveNodeChainIdCCIP,

@@ -84,3 +84,25 @@ export function humanReadableTime(isoTimeStr) {
 
   return humanReadableStr;
 }
+
+export function humanReadableDateFromTimestamp(timestamp) {
+  // Create a new Date object using the timestamp (convert to milliseconds)
+  const date = new Date(timestamp * 1000);
+
+  // Define options for toLocaleDateString to get a readable format
+  const options = {
+    year: "numeric",
+    month: "long",
+    day: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
+    second: "2-digit",
+    hour12: true,
+    timeZoneName: "short",
+  };
+
+  // Use toLocaleString to format the date
+  const humanReadableStr = date.toLocaleString("en-US", options);
+
+  return humanReadableStr;
+}

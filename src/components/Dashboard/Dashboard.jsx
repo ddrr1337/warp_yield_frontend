@@ -12,6 +12,7 @@ import {
   getChainIdByChainIdCCIP,
 } from "@/data/dataContracts";
 import {
+  getLastTimeWarped,
   getIsWarpingNodeFromProvider,
   getActiveNodeChainIdCCIP,
   getERC20BalanceFromProvider,
@@ -24,12 +25,14 @@ import { use, useEffect, useState } from "react";
 import DepositModal from "@/components/modals/DepositModal";
 import WithdrawModal from "@/components/modals/WithdrawModal";
 import { useMetaMask } from "metamask-react";
+import { humanReadableDateFromTimestamp } from "@/utils/utilFuncs";
 
 const Dashboard = () => {
   const [activeNodeChainId, setActiveNodeChainId] = useState(null);
 
   const { status, connect, account, chainId, ethereum } = useMetaMask();
   const [vaultBalance, setVaultBalance] = useState(0);
+  const [lastTimeWarped, setLastTimeWarped] = useState(0);
   const [depositModal, setDepositModal] = useState(false);
   const [withdrawModal, setWithdrawModal] = useState(false);
   const [usdcUserBalance, setUsdcUserBalance] = useState(0);
@@ -37,8 +40,11 @@ const Dashboard = () => {
   const [supplyRate, setSupplyRate] = useState(0);
   const [avaliableToWithdraw, setAvaliableToWithdraw] = useState(0);
   const [isWarping, setIsWarping] = useState(false);
+  const [isVaultBalanceLoaded, setIsVaultBalanceLoaded] = useState(false);
 
   const userChainId = chainId && parseInt(chainId, 16);
+
+  const isWarpingFromActiveNode = isVaultBalanceLoaded && vaultBalance == 0;
 
   const RAY = 10 ** 27;
   const SECONDS_PER_YEAR = 31536000;
@@ -57,6 +63,7 @@ const Dashboard = () => {
       const chainId = getChainIdByChainIdCCIP(parseInt(response));
       setActiveNodeChainId(parseInt(chainId));
     });
+    getLastTimeWarped().then((response) => setLastTimeWarped(response));
   }, []);
   useEffect(() => {
     if (activeNodeChainId) {
@@ -66,6 +73,7 @@ const Dashboard = () => {
         dataContracts[activeNodeChainId].node,
       ).then((response) => {
         setVaultBalance(response);
+        setIsVaultBalanceLoaded(true);
       });
       getNodeAaveSupplyRate(activeNodeChainId).then((response) => {
         const apr = parseInt(response) / RAY;
@@ -76,7 +84,7 @@ const Dashboard = () => {
     }
   }, [activeNodeChainId]);
 
-  useEffect(() => {
+  /*   useEffect(() => {
     const getDepositTransactions = async () => {
       // Consulta todos los eventos de depósito del usuario
       const filter = {
@@ -91,7 +99,7 @@ const Dashboard = () => {
       const logs = await provider.getLogs(filter);
       return logs;
     };
-  }, []);
+  }, []); */
 
   useEffect(() => {
     if (account && activeNodeChainId && vaultBalance) {
@@ -257,6 +265,7 @@ const Dashboard = () => {
                             <td className="px-6 py-4">
                               <div className="flex justify-center">
                                 <button
+                                  disabled={isWarpingFromActiveNode}
                                   onClick={() => {
                                     account
                                       ? chainId != activeNodeChainId
@@ -264,7 +273,7 @@ const Dashboard = () => {
                                         : setDepositModal(true)
                                       : connect();
                                   }}
-                                  className="inline-flex items-center justify-center rounded-[4px] bg-primary px-3 py-2 text-sm  font-medium text-white transition duration-300 ease-in-out hover:bg-primary/90"
+                                  className={`inline-flex items-center justify-center rounded-[4px] bg-primary px-3 py-2 text-sm  font-medium text-white transition duration-300 ease-in-out hover:bg-primary/90 ${isWarpingFromActiveNode && "opacity-50"}`}
                                 >
                                   Deposit
                                 </button>
@@ -359,8 +368,10 @@ const Dashboard = () => {
                   <div className="mb-4 block text-sm text-body-color dark:text-dark-6">
                     Last Time Warped
                   </div>
-                  <div className="w-full resize-none border-0 border-b border-[#f1f1f1] bg-transparent pb-3 text-dark placeholder:text-body-color/60 focus:border-primary focus:outline-none dark:border-dark-3 dark:text-white">
-                    Sun 14 April 2024
+                  <div className="w-full resize-none border-0 border-b border-[#f1f1f1] bg-transparent pb-3 text-sm text-dark placeholder:text-body-color/60 focus:border-primary focus:outline-none dark:border-dark-3 dark:text-white">
+                    {lastTimeWarped == 0
+                      ? "NEVER"
+                      : humanReadableDateFromTimestamp(lastTimeWarped)}
                   </div>
                 </div>
                 <div className="mb-[30px]">
@@ -374,7 +385,13 @@ const Dashboard = () => {
                     <ul className=" mt-2 list-inside list-disc">
                       <li>
                         Deposits:{" "}
-                        <span className="font-bold text-green">Online</span>
+                        <span
+                          className={`ml-2 font-bold ${!isWarpingFromActiveNode ? "text-green" : "text-red-600 dark:text-red"} `}
+                        >
+                          {!isWarpingFromActiveNode
+                            ? "Online"
+                            : "Halted while warping"}
+                        </span>
                       </li>
                       <li>
                         Withdraws:{" "}

@@ -38,6 +38,8 @@ const DepositModal = ({
   const [isSendingLinkApproval, setIsSendingLinkAproval] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
 
+  const masterNodeSameThanActiveNode = masterChainId == activeNodeChainId;
+
   const handleInput = (e) => {
     let value = e.target.value;
     if (e.target.value < 0) {
@@ -183,7 +185,10 @@ const DepositModal = ({
         account,
         dataContracts[activeNodeChainId].node,
       ).then((response) => setUsdcAllowance(response));
-      getCurrentLinkFees();
+
+      if (!masterNodeSameThanActiveNode) {
+        getCurrentLinkFees();
+      }
 
       getERC20Allowance(
         dataContracts[activeNodeChainId].link,
@@ -291,10 +296,10 @@ const DepositModal = ({
                     You Will Get aWRP On{" "}
                     <span>
                       <Image
-                        src={`/images/ethereum.svg`}
+                        src={dataContracts[masterChainId].icon}
                         alt="usdcIcon"
-                        height={10}
-                        width={10}
+                        height={17}
+                        width={17}
                         className="ml-1 "
                       />
                     </span>{" "}
@@ -342,42 +347,56 @@ const DepositModal = ({
                   </div>
                 </div>
 
-                <div className="col-span-2 sm:col-span-1">
-                  <label className="mb-2 ml-1 block text-xs font-medium text-gray-900 dark:text-white">
-                    Current Fee For Deposit
-                  </label>
-                  <div
-                    className={` focus:ring-primary-600 focus:border-primary-600 dark:focus:ring-primary-500 dark:focus:border-primary-500 block flex w-full justify-between rounded-lg border   ${linkFeeRequired > linkAllowance ? "border-red" : "border-gray-300"} bg-gray-50 p-2.5 text-sm text-gray-900 dark:border-gray-500 dark:bg-gray-600 dark:text-white dark:placeholder-gray-400`}
-                  >
+                {!masterNodeSameThanActiveNode ? (
+                  <div className="col-span-2 sm:col-span-1">
+                    <label className="mb-1 ml-1 block text-xs font-medium text-gray-900 dark:text-white">
+                      Current Fee For Deposit
+                    </label>
                     <div
-                      className={`${refreshing && " animate-bounce opacity-50"}`}
+                      className={` focus:ring-primary-600 focus:border-primary-600 dark:focus:ring-primary-500 dark:focus:border-primary-500  flex w-full justify-between rounded-lg border   ${linkFeeRequired > linkAllowance ? "border-red" : "border-gray-300"} bg-gray-50 p-2.5 text-sm text-gray-900 dark:border-gray-500 dark:bg-gray-600 dark:text-white dark:placeholder-gray-400   `}
                     >
-                      {parseFloat(linkFeeRequired / 10 ** 18).toFixed(5)}{" "}
-                      <span className="text-[10px]">LINK</span>
+                      <div
+                        className={`${refreshing && " animate-bounce opacity-50"}`}
+                      >
+                        {parseFloat(linkFeeRequired / 10 ** 18).toFixed(5)}{" "}
+                        <span className="text-[10px]">LINK</span>
+                      </div>
+
+                      <button
+                        onClick={() => {
+                          setRefreshing(true);
+                          getCurrentLinkFees();
+
+                          // Agrega un retardo de 1 segundo antes de cambiar refreshing a false
+                          setTimeout(() => {
+                            setRefreshing(false);
+                          }, 1000); // 1000 milisegundos = 1 segundo
+                        }}
+                      >
+                        <LuRefreshCw
+                          className={`transform transition duration-300 ease-in-out hover:rotate-180 focus:opacity-50`}
+                        />
+                      </button>
                     </div>
-
-                    <button
-                      onClick={() => {
-                        setRefreshing(true);
-                        getCurrentLinkFees();
-
-                        // Agrega un retardo de 1 segundo antes de cambiar refreshing a false
-                        setTimeout(() => {
-                          setRefreshing(false);
-                        }, 1000); // 1000 milisegundos = 1 segundo
-                      }}
-                    >
-                      <LuRefreshCw className=" transform transition duration-300 ease-in-out hover:rotate-180 focus:opacity-50" />
-                    </button>
                   </div>
-                </div>
-                <div className="col-span-2 sm:col-span-1">
+                ) : (
+                  <div className="col-span-2 sm:col-span-1">
+                    <div className=" ml-1 mt-5 text-xs font-medium text-gray-900 dark:text-white">
+                      Master And Node In Same Chain No Link Required
+                    </div>
+                  </div>
+                )}
+
+                <div
+                  className={`col-span-2 sm:col-span-1 ${masterNodeSameThanActiveNode && "opacity-50"}`}
+                >
                   <button
+                    disabled={masterNodeSameThanActiveNode}
                     onClick={() => handleApproveLink()}
                     className={`  
-                   " mt-6 w-40 items-center rounded-[4px] bg-blue-700 px-3 py-1.5 text-center text-xs font-medium text-white hover:bg-blue-800 focus:outline-none focus:ring-4 focus:ring-blue-300 
+                   " mt-6 w-40 items-center rounded-[4px] bg-blue-700 px-3 py-1.5 text-center text-xs font-medium text-white ${!masterNodeSameThanActiveNode && "hover:bg-blue-800"}  focus:outline-none focus:ring-4 focus:ring-blue-300 
                    dark:bg-blue-600 dark:hover:bg-blue-700
-                   dark:focus:ring-blue-800
+                   dark:focus:ring-blue-800 
                   `}
                   >
                     {isSendingLinkApproval ? (
@@ -411,7 +430,6 @@ const DepositModal = ({
                     <span className="">LINK</span>
                   </div>
                 </div>
-
                 <div className="col-span-2">
                   <label className="mb-2 ml-1 block text-sm font-medium text-gray-900 dark:text-white">
                     Important Information
@@ -481,7 +499,7 @@ const DepositModal = ({
                   </div>
                 </>
               )}
-              {isDepositTx && txHash && (
+              {isDepositTx && txHash && !masterNodeSameThanActiveNode && (
                 <>
                   <div className="mt-4 flex items-center">
                     <div className="flex-grow border-b border-gray-300"></div>
@@ -506,6 +524,35 @@ const DepositModal = ({
                         0,
                         15,
                       )}...${txHash.hash.slice(-15)}`}</span>
+                    </Link>
+                  </div>
+                </>
+              )}
+              {isDepositTx && txHash && masterNodeSameThanActiveNode && (
+                <>
+                  <div className="mt-4 flex items-center">
+                    <div className="flex-grow border-b border-gray-300"></div>
+                  </div>
+                  <div className="mt-2 flex justify-center text-sm">
+                    <Image
+                      src={dataContracts[activeNodeChainId].icon}
+                      alt="usdcIcon"
+                      height={20}
+                      width={20}
+                      className="-mt-1 mr-1 "
+                    />
+                    Transaction Hash
+                  </div>
+
+                  <div className="mt-1 flex justify-center text-sm">
+                    <Link
+                      href={`${dataContracts[activeNodeChainId].explorer}tx/${isDepositTx.hash}`}
+                      target="_blank"
+                    >
+                      <span className="hover:text-violet-500">{`${isDepositTx.hash.slice(
+                        0,
+                        15,
+                      )}...${isDepositTx.hash.slice(-15)}`}</span>
                     </Link>
                   </div>
                 </>
