@@ -26,6 +26,7 @@ import DepositModal from "@/components/modals/DepositModal";
 import WithdrawModal from "@/components/modals/WithdrawModal";
 import { useMetaMask } from "metamask-react";
 import { humanReadableDateFromTimestamp } from "@/utils/utilFuncs";
+import Loading from "../Common/Loading";
 
 const Dashboard = () => {
   const [activeNodeChainId, setActiveNodeChainId] = useState(null);
@@ -41,6 +42,8 @@ const Dashboard = () => {
   const [avaliableToWithdraw, setAvaliableToWithdraw] = useState(0);
   const [isWarping, setIsWarping] = useState(false);
   const [isVaultBalanceLoaded, setIsVaultBalanceLoaded] = useState(false);
+  const [loadingAwrp, setLoadingAwrp] = useState(true);
+  const [loadingAvl, setLoadingAvl] = useState(true);
 
   const userChainId = chainId && parseInt(chainId, 16);
 
@@ -117,12 +120,14 @@ const Dashboard = () => {
         account,
       ).then((response) => {
         setAWRPUserBalance(response);
+        setLoadingAwrp(false);
         if (response != 0) {
           getAvaliableToWithdrawFromProvider(
             dataContracts[activeNodeChainId].node,
             dataContracts[activeNodeChainId].provider.alchemy,
             response,
           ).then((response) => {
+            setLoadingAvl(false);
             setAvaliableToWithdraw(response);
           });
         }
@@ -220,11 +225,19 @@ const Dashboard = () => {
                             </div>
                           </th>
                           <td className="px-6 py-4 text-center text-sm">
-                            {parseFloat(AWRPUserBalance / 10 ** 18).toFixed(2)}
+                            {loadingAwrp ? (
+                              <Loading />
+                            ) : (
+                              parseFloat(AWRPUserBalance / 10 ** 18).toFixed(2)
+                            )}
                           </td>
                           <td className="px-6 py-4 text-center text-sm">
-                            {parseFloat(avaliableToWithdraw / 10 ** 6).toFixed(
-                              6,
+                            {loadingAvl ? (
+                              <Loading />
+                            ) : (
+                              parseFloat(avaliableToWithdraw / 10 ** 6).toFixed(
+                                6,
+                              )
                             )}
                           </td>
                           <td className=" px-6 py-4">

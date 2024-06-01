@@ -31,6 +31,8 @@ const Hero = () => {
     });
   }, []);
 
+  console.log(activeNodeChainId);
+
   useEffect(() => {
     if (activeNodeChainId) {
       getERC20BalanceFromProvider(
