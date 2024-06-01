@@ -42,7 +42,8 @@ Once the master contract has the necessary information to perform the warp, it w
 The time window to execute the warp will be 2 hour from the time the node information arrives at the master contract.  
 If the necessary requirements are met, the warpAssets() function will be avaliable to call.
 Once WArp inits, no other call to warpAssets will be allowed in next 24h.  
-The command will reach the active node and the funds will automatically be withdrawn from the current AAVE pool and transferred to the USDC bridge. At the same time, the necessary data will also be sent to the destination node.
+The command will reach the active node and the funds will automatically be withdrawn from the current AAVE pool and transferred to the USDC bridge. At the same time, the necessary data will also be sent to the destination node.  
+Once the Assets are allocated in the new chain, the new active node will send to master contract the command to resume operations normaly.
 ```mermaid
 graph TD;
 

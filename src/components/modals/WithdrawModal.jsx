@@ -380,16 +380,24 @@ const WithdrawModal = ({
                   </div>
                 </div>
               </div>
-
-              <button
-                onClick={() => handleWithdraw()}
-                className={`  
-                 " w-40 items-center rounded-[4px] bg-blue-700 px-5 py-2.5 text-center text-sm font-medium text-white hover:bg-blue-800 focus:outline-none focus:ring-4 focus:ring-blue-300 dark:bg-blue-600 dark:hover:bg-blue-700 
-                 dark:focus:ring-blue-800
+              <div className="flex">
+                <button
+                  onClick={() => handleWithdraw()}
+                  disabled={linkFeeRequired > linkAllowance}
+                  className={`  
+                 " w-40 items-center rounded-[4px] bg-blue-700 px-5 py-2.5 text-center text-sm font-medium text-white  focus:outline-none focus:ring-4 focus:ring-blue-300 dark:bg-blue-600  
+                 dark:focus:ring-blue-800 ${linkFeeRequired > linkAllowance ? "opacity-50" : "hover:bg-blue-800 dark:hover:bg-blue-700"}
                 `}
-              >
-                {isSendingTx ? <Loading /> : "Withdraw"}
-              </button>
+                >
+                  {isSendingTx ? <Loading /> : "Withdraw"}
+                </button>
+                {linkFeeRequired > linkAllowance && (
+                  <div className="ml-5 flex items-center justify-center text-xs text-red">
+                    Approve some Link first
+                  </div>
+                )}
+              </div>
+
               <div>
                 {txHashApprove && (
                   <>

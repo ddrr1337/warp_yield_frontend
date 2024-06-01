@@ -37,7 +37,7 @@ const Faq = () => {
             />
             <SingleFaq
               question="Why I need to pay LINK fees"
-              answer="Warp Yield uses the CCIP protocol for token and message exchanges between blockchains. These services are paid for with the LINK token"
+              answer="Warp Yield uses the CCIP services for token and message exchanges between blockchains. These services are paid for with the LINK token"
             />
             <SingleFaq
               question="Can anyone warp assets in vault?"

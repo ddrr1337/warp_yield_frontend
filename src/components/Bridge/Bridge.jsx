@@ -230,7 +230,7 @@ const Bridge = () => {
             <div className="ud-contact-content-wrapper">
               <div className="ud-contact-title -mt-40">
                 <span className="mb-6 block text-base font-medium text-dark dark:text-white">
-                  BRIDGE V0.9
+                  BRIDGE V.05
                 </span>
                 <h2 className="  max-w-[300px]  text-[30px] font-semibold leading-[1.14] text-dark dark:text-white">
                   Bridge USDC To Multiple Chains
@@ -368,124 +368,144 @@ const Bridge = () => {
                     USDC
                   </div>
                 )}
-                <div className="mt-5 flex justify-center">
-                  {!messageHash && !attestation && (
-                    <div>
-                      {originChain?.chainId == chainId ? (
-                        usdcAllowance >= usdcToBridge * 10 ** 6 ? (
-                          <button
-                            onClick={() => handleSendToBridge()}
-                            disabled={usdcToBridge == 0}
-                            className={`  
+                {!account && (
+                  <div className="mt-5 flex justify-center">
+                    <button
+                      onClick={() => {
+                        connect();
+                      }}
+                      className={`w-48 items-center rounded-[4px] bg-blue-700 px-5 py-2.5 text-center text-sm font-medium text-white hover:bg-blue-800 focus:outline-none focus:ring-4 focus:ring-blue-300 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800 `}
+                    >
+                      Connect
+                    </button>
+                  </div>
+                )}
+
+                {account && (
+                  <>
+                    <div className="mt-5 flex justify-center">
+                      {!messageHash && !attestation && (
+                        <div>
+                          {originChain?.chainId == chainId ? (
+                            usdcAllowance >= usdcToBridge * 10 ** 6 ? (
+                              <button
+                                onClick={() => handleSendToBridge()}
+                                disabled={usdcToBridge == 0}
+                                className={`  
                         " w-48 items-center rounded-[4px] bg-blue-700 px-5 py-2.5 text-center text-sm font-medium text-white hover:bg-blue-800 focus:outline-none focus:ring-4 focus:ring-blue-300 dark:bg-blue-600 dark:hover:bg-blue-700 
                         dark:focus:ring-blue-800 ${usdcToBridge == 0 ? "opacity-50" : "opacity-100"}
                         `}
-                          >
-                            {isSendingTx ? (
-                              <Loading />
+                              >
+                                {isSendingTx ? (
+                                  <Loading />
+                                ) : (
+                                  <span>Send To {destinationChain?.text}</span>
+                                )}
+                              </button>
                             ) : (
-                              <span>Send To {destinationChain?.text}</span>
-                            )}
-                          </button>
-                        ) : (
-                          <button
-                            onClick={() => handleApprove()}
-                            className={`  
+                              <button
+                                onClick={() => handleApprove()}
+                                className={`  
                " w-48 items-center rounded-[4px] bg-blue-700 px-5 py-2.5 text-center text-sm font-medium text-white hover:bg-blue-800 focus:outline-none focus:ring-4 focus:ring-blue-300 dark:bg-blue-600 dark:hover:bg-blue-700 
                dark:focus:ring-blue-800
               `}
-                          >
-                            {isSendingTx ? <Loading /> : "Approve USDC"}
-                          </button>
-                        )
-                      ) : (
-                        <button
-                          onClick={() => switchNetwork(originChain.chainId)}
-                          disabled={!originChain}
-                          className={`  
+                              >
+                                {isSendingTx ? <Loading /> : "Approve USDC"}
+                              </button>
+                            )
+                          ) : (
+                            <button
+                              onClick={() => switchNetwork(originChain.chainId)}
+                              disabled={!originChain}
+                              className={`  
                         " w-48 items-center rounded-[4px] bg-blue-700 px-5 py-2.5 text-center text-sm font-medium text-white hover:bg-blue-800 focus:outline-none focus:ring-4 focus:ring-blue-300 dark:bg-blue-600 dark:hover:bg-blue-700 
                         dark:focus:ring-blue-800
                         `}
+                            >
+                              {!originChain ? (
+                                "Select Origin Chain"
+                              ) : (
+                                <span>Connect To {originChain?.text}</span>
+                              )}
+                            </button>
+                          )}
+                        </div>
+                      )}
+                      {messageHash && attestation && !bridgeComplete && (
+                        <button
+                          onClick={() =>
+                            chainId != destinationChain.chainId
+                              ? switchNetwork(destinationChain.chainId)
+                              : handleClaimFromBridge()
+                          }
+                          className={`${isSendingTx && "w-48"} items-center rounded-[4px] bg-blue-700 px-5 py-2.5 text-center text-sm font-medium text-white hover:bg-blue-800 focus:outline-none focus:ring-4 focus:ring-blue-300 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800 ${!messageHash || !attestation ? "opacity-50" : ""}`}
                         >
-                          {!originChain ? (
-                            "Select Origin Chain"
+                          {" "}
+                          {isSendingTx ? (
+                            <Loading />
                           ) : (
-                            <span>Connect To {originChain?.text}</span>
+                            <>
+                              {" "}
+                              {chainId != destinationChain.chainId
+                                ? `Click To Connect To ${dataContracts[destinationChain.chainId].formatedName} To Claim`
+                                : `Claim USDC On ${dataContracts[destinationChain.chainId].formatedName}`}
+                            </>
                           )}
                         </button>
                       )}
-                    </div>
-                  )}
-                  {messageHash && attestation && !bridgeComplete && (
-                    <button
-                      onClick={() =>
-                        chainId != destinationChain.chainId
-                          ? switchNetwork(destinationChain.chainId)
-                          : handleClaimFromBridge()
-                      }
-                      className={`${isSendingTx && "w-48"} items-center rounded-[4px] bg-blue-700 px-5 py-2.5 text-center text-sm font-medium text-white hover:bg-blue-800 focus:outline-none focus:ring-4 focus:ring-blue-300 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800 ${!messageHash || !attestation ? "opacity-50" : ""}`}
-                    >
-                      {" "}
-                      {isSendingTx ? (
-                        <Loading />
-                      ) : (
-                        <>
-                          {" "}
-                          {chainId != destinationChain.chainId
-                            ? `Click To Connect To ${dataContracts[destinationChain.chainId].formatedName} To Claim`
-                            : `Claim USDC On ${dataContracts[destinationChain.chainId].formatedName}`}
-                        </>
+                      {bridgeComplete && (
+                        <button
+                          onClick={() => {
+                            setTxHash(null);
+                            setMessageHash(null);
+                            setMessageBytes(null);
+                            setAttestation(null);
+                            setBridgeComplte(false);
+                          }}
+                          disabled={!messageHash || !attestation}
+                          className={`w-48 items-center rounded-[4px] bg-blue-700 px-5 py-2.5 text-center text-sm font-medium text-white hover:bg-blue-800 focus:outline-none focus:ring-4 focus:ring-blue-300 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800 ${!messageHash || !attestation ? "opacity-50" : ""}`}
+                        >
+                          Bridge More USDC
+                        </button>
                       )}
-                    </button>
-                  )}
-                  {bridgeComplete && (
-                    <button
-                      onClick={() => {
-                        setTxHash(null);
-                        setMessageHash(null);
-                        setMessageBytes(null);
-                        setAttestation(null);
-                        setBridgeComplte(false);
-                      }}
-                      disabled={!messageHash || !attestation}
-                      className={`w-48 items-center rounded-[4px] bg-blue-700 px-5 py-2.5 text-center text-sm font-medium text-white hover:bg-blue-800 focus:outline-none focus:ring-4 focus:ring-blue-300 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800 ${!messageHash || !attestation ? "opacity-50" : ""}`}
-                    >
-                      Bridge More USDC
-                    </button>
-                  )}
 
-                  {messageHash && !attestation && sendingToDestination && (
-                    <div>
-                      <div className="animate-pulse text-center text-green-600 dark:text-green-300">
-                        Sending to{" "}
-                        {dataContracts[destinationChain?.chainId]?.formatedName}
-                        .... Please Whait
-                      </div>
-                      <div className="text-center text-sm">
-                        {`${confirmations.toString()} Confirmations of ${dataContracts[originChain.chainId].bridgeConfirmations} Minimum Needed`}{" "}
-                      </div>
+                      {messageHash && !attestation && sendingToDestination && (
+                        <div>
+                          <div className="animate-pulse text-center text-green-600 dark:text-green-300">
+                            Sending to{" "}
+                            {
+                              dataContracts[destinationChain?.chainId]
+                                ?.formatedName
+                            }
+                            .... Please Whait
+                          </div>
+                          <div className="text-center text-sm">
+                            {`${confirmations.toString()} Confirmations of ${dataContracts[originChain.chainId].bridgeConfirmations} Minimum Needed`}{" "}
+                          </div>
+                        </div>
+                      )}
                     </div>
-                  )}
-                </div>
-                <div className=" relative mb-2 mt-14 flex items-center overflow-hidden rounded-lg border-2  border-gray-300 shadow-sm   dark:border-gray-600">
-                  <div className="flex w-[160px] items-center self-stretch border-r-2 border-gray-300  bg-gray-200 px-2 dark:border-gray-600 dark:bg-gray-700">
-                    <div className="font-display text-jacarta-700 mb-1 ml-2 mt-1 flex text-sm">
-                      <IoInformationCircleOutline
-                        size={18}
-                        className="-ml-1 mr-1"
-                      />{" "}
-                      Manual Claim Tx:
-                    </div>
-                  </div>
+                    <div className=" relative mb-2 mt-14 flex items-center overflow-hidden rounded-lg border-2  border-gray-300 shadow-sm   dark:border-gray-600">
+                      <div className="flex w-[160px] items-center self-stretch border-r-2 border-gray-300  bg-gray-200 px-2 dark:border-gray-600 dark:bg-gray-700">
+                        <div className="font-display text-jacarta-700 mb-1 ml-2 mt-1 flex text-sm">
+                          <IoInformationCircleOutline
+                            size={18}
+                            className="-ml-1 mr-1"
+                          />{" "}
+                          Manual Claim Tx:
+                        </div>
+                      </div>
 
-                  <input
-                    onChange={(e) => setTxHash(e.target.value)}
-                    type="text"
-                    className=" h-12 w-full flex-[3] border-0 px-2 focus:ring-indigo-500 dark:bg-dark-2"
-                    placeholder="Tx Of Origin Blockchain"
-                    value={txHash?.hash}
-                  />
-                </div>
+                      <input
+                        onChange={(e) => setTxHash(e.target.value)}
+                        type="text"
+                        className=" h-12 w-full flex-[3] border-0 px-2 focus:ring-indigo-500 dark:bg-dark-2"
+                        placeholder="Tx Of Origin Blockchain"
+                        value={txHash?.hash}
+                      />
+                    </div>
+                  </>
+                )}
 
                 {bridgeComplete && (
                   <div className=" text-center text-green-600 dark:text-green-300">

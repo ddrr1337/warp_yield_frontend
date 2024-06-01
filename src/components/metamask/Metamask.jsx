@@ -52,6 +52,28 @@ const switchNetwork = async (chainId) => {
   }
 };
 
+const addChainNetwork = async () => {
+  await window.ethereum.request({
+    method: "wallet_addEthereumChain",
+    params: [
+      {
+        chainId: `0x${chainId.toString(16)}`,
+        chainName: dataContracts[chainId].rpcName,
+        rpcUrls: [dataContracts[chainId].rpcUrl],
+        iconUrls: [
+          "https://xdaichain.com/fake/example/url/xdai.svg",
+          "https://xdaichain.com/fake/example/url/xdai.png",
+        ],
+        nativeCurrency: {
+          symbol: "ETH",
+          decimals: 18,
+        },
+        blockExplorerUrls: ["https://blockscout.com/poa/xdai/"],
+      },
+    ],
+  });
+};
+
 async function addNetworkToMetaMask(networkDetails) {
   if (window.ethereum) {
     try {

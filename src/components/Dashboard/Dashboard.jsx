@@ -145,7 +145,7 @@ const Dashboard = () => {
             <div className="ud-contact-content-wrapper">
               <div className="ud-contact-title mb-12 lg:mb-[150px]">
                 <span className="mb-6 block text-base font-medium text-dark dark:text-white">
-                  DASHBOARD V0.9
+                  DASHBOARD V.05
                 </span>
                 <h2 className="max-w-[260px] text-[30px] font-semibold leading-[1.14] text-dark dark:text-white">
                   Deposit And Withdraw Assets
@@ -185,10 +185,10 @@ const Dashboard = () => {
                             Asset
                           </th>
                           <th scope="col" className="px-6 py-3 text-center">
-                            Your Balance
+                            aWRP Balance
                           </th>
                           <th scope="col" className="px-6 py-3 text-center">
-                            Avl To Withdraw
+                            USDC To Withdraw
                           </th>
                           <th scope="col" className=" px-6 py-3 text-center">
                             <div className="flex">Deposit </div>
@@ -220,7 +220,7 @@ const Dashboard = () => {
                             </div>
                           </th>
                           <td className="px-6 py-4 text-center text-sm">
-                            {parseFloat(usdcUserBalance / 10 ** 6).toFixed(2)}
+                            {parseFloat(AWRPUserBalance / 10 ** 18).toFixed(2)}
                           </td>
                           <td className="px-6 py-4 text-center text-sm">
                             {parseFloat(avaliableToWithdraw / 10 ** 6).toFixed(

@@ -20,12 +20,30 @@ The Node contract handles the following roles:
 1. Sending critical data to the Master contract to facilitate successful fund warp.
 2. Executing USDC [deposits](/docs/nodeContractRoles/deposits) from participating users.  
 
+
+#### Contract structure
+
+Both MasterNode.sol and Node.sol follow this same scheme:
+
+
+<div className="border border-black rounded-lg mt-10 w-[500px] pb-5">
+<span className="mt-2 ml-2 text-center">Contract structure MasterNode.sol and Node.sol</span>
+```mermaid 
+flowchart LR;
+    A[Setup Master/Node]
+    B[Handle Incomming Messages]
+    C[_ccipReceive - function called by ChainLink]
+    D[_sendMessage - send message center]
+    E[Hanlde Outgoing messages]
+    F[utility funcitons]
+```
+</div>
+
+
 #### Link token
 
 Why does Warp Yield need the Link token?  
 
 Warp Yield sends commands between contracts and across blockchains using Chainlink CCIP services. These services ensure the correct sending and receiving of commands across blockchains. For this reason, when a user wants to make a deposit or withdrawal, they must pay an additional gas cost in the form of the Link token to ensure the successful broadcast of their command.
-
- 
 
 

@@ -19,13 +19,15 @@ For presentation and testing purposes, Warp Yield is deployed on EVM testnets.
 ```mermaid
 graph TD;
 
-A[Arbitrum Sepolia]
-B[Optimistic Sepolia];
-C[Base Sepolia];
+A[Arbitrum Sepolia Master]
+B[Optimistic Sepolia Node];
+C[Base Sepolia Node];
+D[Arbitrum Sepolia Node];
 
 
 A --> B;
 A --> C
+A --> D
 
 
 ```
@@ -34,7 +36,7 @@ A --> C
 
 Warp Yield is in test mode. This has important implications.
 
-Warp Yield will not perform any checks to warp to another node.
+<strong>Warp Yield will not perform any checks to warp to another node.</strong>   
 Warp Yield in test mode is deployed on 3 blockchains:
 
 1. Aribitrum Sepolia
@@ -43,6 +45,6 @@ Warp Yield in test mode is deployed on 3 blockchains:
 
 Warp Yield can operate on any network that ChainLink CCIP supports. You can see the networks currently supported by ChainLink here. [View Blockains](https://docs.chain.link/ccip/supported-networks/v1_2_0/mainnet)
 
-
+If you want to test your own Warp Yield vault, you have instructions of how to do this in the main [github repo](https://github.com/ddrr1337/warp_aave)
 
 
