@@ -8,9 +8,9 @@ Install packages:
 npm install
 ```
 
-set `.env.local` use your RPC providers
+set `.env.local` use your RPC providers use `.env.example` as an example.
 
-If you make a new deploy you need to set master contract and nodes contracts addresses in `/src/data/dataContracts.js`
+If you make a new deploy of the contracts, you will need to set master contract and nodes contracts addresses in `/src/data/dataContracts.js`
 
 ```shell
 npm run dev
