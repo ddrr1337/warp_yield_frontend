@@ -17,8 +17,7 @@ export const dataContracts = {
     rpcName: "Sepolia",
     rpcUrl: "https://ethereum-sepolia-rpc.publicnode.com",
     provider: {
-      alchemy:
-        "wss://eth-sepolia.g.alchemy.com/v2/aQbA2ZhNVWoRwwM1Rmr29xOOuh6btgqs",
+      alchemy: process.env.NEXT_PUBLIC_SEPOLIA_HOST,
     },
   },
   421614: {
@@ -41,8 +40,7 @@ export const dataContracts = {
     rpcName: "Arbitrum Sepolia",
     rpcUrl: "https://sepolia-rollup.arbitrum.io/rpc",
     provider: {
-      alchemy:
-        "wss://arb-sepolia.g.alchemy.com/v2/rf4pcF1cGQ1GT3ZxXlT7ot-ZpxJqn37Q",
+      alchemy: process.env.NEXT_PUBLIC_SEPOLIA_ARBITRUM_HOST,
     },
   },
   11155420: {
@@ -62,8 +60,7 @@ export const dataContracts = {
     icon: "/images/optimistic.svg",
     explorer: "https://sepolia-optimism.etherscan.io/",
     provider: {
-      alchemy:
-        "wss://opt-sepolia.g.alchemy.com/v2/dzA2e971vCGN7ZPUjy8vw8an7If9tyvc",
+      alchemy: process.env.NEXT_PUBLIC_SEPOLIA_OPTIMISTIC_HOST,
     },
   },
   84532: {
@@ -83,10 +80,11 @@ export const dataContracts = {
     icon: "/images/base.svg",
     explorer: "https://base-sepolia.blockscout.com",
     provider: {
-      alchemy:
-        "wss://base-sepolia.g.alchemy.com/v2/BWE1kAIIbMk7iHPMjVsdwRwx-3ITgtCy",
+      alchemy: process.env.NEXT_PUBLIC_SEPOLIA_BASE_HOST,
     },
   },
+
+  // NOT USED AVAX AND POLYGON
   43113: {
     chainName: "avax_fuji",
     formatedName: "Avalanche",
