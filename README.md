@@ -12,6 +12,8 @@ set `.env.local` use your RPC providers use `.env.example` as an example.
 
 If you make a new deploy of the contracts, you will need to set master contract and nodes contracts addresses in `/src/data/dataContracts.js`
 
+Run dev server
+
 ```shell
 npm run dev
 
