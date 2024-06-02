@@ -2,7 +2,7 @@
 # Warp Assets
 
 
-Of course becouse the protocol is permissionless, anyone can start a warp vault.
+Of course because the protocol is permissionless, anyone can start a warp vault.
 
 Warp Vault is completed in 2 steps
 
@@ -59,16 +59,15 @@ F --> Z;
 
 ```solidity filename="MasterNode.sol" {}
     function warpAssets(
-        uint64 _destinationCCIPid,
         address _destinationNodeAddress
     ) external
 ```
 
 <strong>Inputs:</strong>
 
-<span className="underline">uint32 _destinationCCIPid:</span> CCIP Identificator of new node vault is warping
 
-<span className="underline">uint64 _destinationNodeAddress:</span>Address new node vault is warping
+
+<span className="font-semibold mr-2">address _destinationNodeAddress: </span>Address new node vault is warping
 
 <div className="mt-10"><strong>Fees</strong></div>
 
@@ -80,9 +79,9 @@ Once warp vault is approved and performed, master node operation will halt. So <
 
 ### Once Warp Is Initiated:
 
-Once the Warp has been initiated, the order will arrive at the active node, which will process it to send the funds to the newly designated node. The fees necessary for this operation will be deducted from the general vault.
+Once the Warp has been initiated, the order will arrive at the active node, which will process it to send the funds to the newly designated node. The fees necessary for this operation will be automatically deducted from the general vault.
 
-Once the funds reach the newly designated node, the node will automatically supply these funds to AAVE to immediately start earning new interest. It will also send the order to the master contract to resume withdrawal operations. These fees will also be covered by the vault.
+Once the funds reach the newly designated node, the node will automatically supply these funds to AAVE to immediately start earning new interest. It will also send the order to the master contract to resume withdrawal operations. These fees will also be covered automatically by the vault.
 
 
 

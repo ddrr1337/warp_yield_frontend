@@ -87,23 +87,6 @@ const Dashboard = () => {
     }
   }, [activeNodeChainId]);
 
-  /*   useEffect(() => {
-    const getDepositTransactions = async () => {
-      // Consulta todos los eventos de depósito del usuario
-      const filter = {
-        address: dataContracts[activeNodeChainId].node,
-        topics: [
-          ethers.utils.id("Deposit(address,uint256)"),
-          ethers.utils.hexZeroPad(account, 32),
-        ],
-        fromBlock: 0, // Puedes especificar el bloque inicial
-        toBlock: "latest",
-      };
-      const logs = await provider.getLogs(filter);
-      return logs;
-    };
-  }, []); */
-
   useEffect(() => {
     if (account && activeNodeChainId && vaultBalance) {
       getERC20BalanceFromProvider(
@@ -121,25 +104,31 @@ const Dashboard = () => {
       ).then((response) => {
         setAWRPUserBalance(response);
         setLoadingAwrp(false);
+
         if (response != 0) {
           getAvaliableToWithdrawFromProvider(
             dataContracts[activeNodeChainId].node,
             dataContracts[activeNodeChainId].provider.alchemy,
             response,
           ).then((response) => {
-            setLoadingAvl(false);
             setAvaliableToWithdraw(response);
           });
+        } else {
+          setLoadingAvl(false);
         }
       });
+    } else {
+      setLoadingAvl(false);
+      setLoadingAwrp(false);
     }
   }, [account, activeNodeChainId, vaultBalance]);
 
   useEffect(() => {
     setDepositModal(false);
     setWithdrawModal(false);
-  }, [chainId, activeNodeChainId, vaultBalance]);
+  }, [chainId, activeNodeChainId]);
 
+  console.log(depositModal);
   return (
     <section id="contact" className="relative py-20 md:py-[120px]">
       <div className="absolute left-0 top-0 -z-[1] h-full w-full dark:bg-dark"></div>
@@ -433,6 +422,7 @@ const Dashboard = () => {
               account={account}
               activeNodeChainId={activeNodeChainId}
               masterChainId={masterChainId}
+              setVaultBalance={setVaultBalance}
             />
           )}
           {withdrawModal && userChainId == masterChainId && (

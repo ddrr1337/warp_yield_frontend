@@ -161,6 +161,8 @@ const WithdrawModal = ({
     }
   };
 
+  const notEnoughLink = parseInt(linkFeeRequired) > parseInt(linkAllowance);
+
   return (
     withdrawModal && (
       <div
@@ -281,7 +283,7 @@ const WithdrawModal = ({
                       Current Fee For Deposit
                     </label>
                     <div
-                      className={` focus:ring-primary-600 focus:border-primary-600 dark:focus:ring-primary-500 dark:focus:border-primary-500  flex w-full justify-between rounded-lg border   ${linkFeeRequired > linkAllowance ? "border-red" : "border-gray-300"} bg-gray-50 p-2.5 text-sm text-gray-900 dark:border-gray-500 dark:bg-gray-600 dark:text-white dark:placeholder-gray-400   `}
+                      className={` focus:ring-primary-600 focus:border-primary-600 dark:focus:ring-primary-500 dark:focus:border-primary-500  flex w-full justify-between rounded-lg border   ${notEnoughLink ? "border-red" : "border-gray-300"} bg-gray-50 p-2.5 text-sm text-gray-900 dark:border-gray-500 dark:bg-gray-600 dark:text-white dark:placeholder-gray-400   `}
                     >
                       <div
                         className={`${refreshing && " animate-bounce opacity-50"}`}
@@ -383,15 +385,15 @@ const WithdrawModal = ({
               <div className="flex">
                 <button
                   onClick={() => handleWithdraw()}
-                  disabled={linkFeeRequired > linkAllowance}
+                  disabled={notEnoughLink}
                   className={`  
                  " w-40 items-center rounded-[4px] bg-blue-700 px-5 py-2.5 text-center text-sm font-medium text-white  focus:outline-none focus:ring-4 focus:ring-blue-300 dark:bg-blue-600  
-                 dark:focus:ring-blue-800 ${linkFeeRequired > linkAllowance ? "opacity-50" : "hover:bg-blue-800 dark:hover:bg-blue-700"}
+                 dark:focus:ring-blue-800 ${notEnoughLink ? "opacity-50" : "hover:bg-blue-800 dark:hover:bg-blue-700"}
                 `}
                 >
                   {isSendingTx ? <Loading /> : "Withdraw"}
                 </button>
-                {linkFeeRequired > linkAllowance && (
+                {notEnoughLink && (
                   <div className="ml-5 flex items-center justify-center text-xs text-red">
                     Approve some Link first
                   </div>
@@ -476,13 +478,13 @@ const WithdrawModal = ({
 
                     <div className="mt-1 flex justify-center text-sm">
                       <Link
-                        href={`${dataContracts[activeNodeChainId].explorer}tx/${isDepositTx.hash}`}
+                        href={`${dataContracts[activeNodeChainId].explorer}tx/${txHash.hash}`}
                         target="_blank"
                       >
-                        <span className="hover:text-violet-500">{`${isDepositTx.hash.slice(
+                        <span className="hover:text-violet-500">{`${txHash.hash.slice(
                           0,
                           15,
-                        )}...${isDepositTx.hash.slice(-15)}`}</span>
+                        )}...${txHash.hash.slice(-15)}`}</span>
                       </Link>
                     </div>
                   </>
