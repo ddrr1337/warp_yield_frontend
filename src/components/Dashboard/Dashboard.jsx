@@ -433,6 +433,9 @@ const Dashboard = () => {
               activeNodeChainId={activeNodeChainId}
               account={account}
               masterChainId={masterChainId}
+              AWRPUserBalance={AWRPUserBalance}
+              setAWRPUserBalance={setAWRPUserBalance}
+              setAvaliableToWithdraw={setAvaliableToWithdraw}
             />
           )}
         </>

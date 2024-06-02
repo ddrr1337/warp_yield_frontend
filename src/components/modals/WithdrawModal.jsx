@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import {
+  getAvaliableToWithdrawFromProvider,
   getERC20Balance,
   getERC20BalanceFromProvider,
   getTotalSupplyAWRPFromProvider,
@@ -24,9 +25,12 @@ const WithdrawModal = ({
   activeNodeChainId,
   masterChainId,
   account,
+  AWRPUserBalance,
+  setAWRPUserBalance,
+  setAvaliableToWithdraw,
 }) => {
   const [vaultBalance, setVaultBalance] = useState(0);
-  const [AWRPUserBalance, setAWRPUserBalance] = useState(0);
+
   const [linkFeeRequired, setLinkFeeRequired] = useState(0);
   const [linkAllowance, setLinkAllowance] = useState(0);
   const [AWRPTotalSupply, setAWRPTotalSupply] = useState(0);
@@ -153,6 +157,14 @@ const WithdrawModal = ({
           dataContracts[masterChainId].master,
         );
         setLinkAllowance(response);
+
+        const responseAvl = await getAvaliableToWithdrawFromProvider(
+          dataContracts[activeNodeChainId].node,
+          dataContracts[activeNodeChainId].provider.alchemy,
+          responseBalanceAwrp,
+        );
+
+        setAvaliableToWithdraw(responseAvl);
       }
     } catch (error) {
       console.error("Error withdrawing USDC:", error);
