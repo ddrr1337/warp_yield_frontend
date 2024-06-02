@@ -2,9 +2,6 @@
 
 This the frontend actually Warp Yield is using.
 
-_Template Credits:_
-Designed and Developed by TailGrids and Next.js Templates
-
 Install packages:
 
 ```shell
@@ -21,3 +18,6 @@ Run dev server
 npm run dev
 
 ```
+
+_Template Credits:\__
+_Designed and Developed by TailGrids and Next.js Templates_
